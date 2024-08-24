@@ -1,0 +1,593 @@
+{% extends "admin.html" %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="page-inner">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-round">
+                        
+                        <div class="card-header">
+                            <div class="card-head-row card-tools-still-right">
+
+                                <div class="card-tools">
+
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card">
+                                        <span class="fa fa-sync-alt"></span>
+                                    </button>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+
+                                <div class="col-md-3">
+                                    
+                                    <div class="d-none">
+                                        <div class="form-group d-flex align-items-center">
+                                            <label for="search_partnum" class="me-2" style="min-width: 100px;">Vendor</label>
+                                            <input type="text" class="form-control" id="search_partnum" placeholder="Search Vendor"/>
+                                        </div>
+                                    
+                                        <div class="d-flex justify-content-end">
+                                            <button class="btn btn-primary btn-border me-3" id="search_button">Search</button>
+                                        </div>
+                                        <hr>
+                                    </div>
+
+                                    <div class="table-responsive main_table">
+                                        <table class="table table-hovered" id="main_table">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">Registered Vendors</th>
+                                                </tr>
+                                            </thead>
+
+                                            <tbody>
+                                                {% for vendor in vendors %}
+                    
+                                                <tr data-vendor-id="{{ vendor.id }}"
+                                                    data-vendor-name = "{{ vendor.vendor_name }}"
+                                                    data-vendor-default = "{{ vendor.default }}"
+                                                    data-status = "{{ vendor.status }}"
+                                                    data-created-at = "{{ vendor.created_at }}"
+                                                    data-updated-at = "{{ vendor.updated_at }}"
+                                                >
+                                                    <td style="text-transform: uppercase;">
+                                                        <span>{{ vendor.vendor_name }}</span>
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    
+                                    </div>
+                                </div>
+
+                                <div class="col-md-9">
+                                    <div class="card">
+                                        <div class="card-header d-flex align-items-center justify-content-between" style="background-color: darkblue;">
+                                            <h4 class="card-title" style="color: white;">Vendor Details: <span class="ms-3" id="header-vendor"></span> </h4>
+
+                                            <button href="#" id="add_vendor" class="btn btn-icon btn-link btn-primary btn-xs" data-bs-toggle="modal" data-bs-target="#add-vendor-modal">
+                                                <span class="fa fa-plus" style="color: white;"></span>
+                                            </button>
+            
+                                            <div class="btn-group d-none">
+            
+                                                <button href="#" id="update_vendor_btn" class="btn btn-icon btn-link btn-primary btn-xs" title="Add Vendor">
+                                                    <span class="fa fa-save" style="color: white;"></span>
+                                                </button>
+                                                
+                                                <span class="divider" style="border-left: 1px solid #ccc; height: 24px; margin: 0 10px;"></span>
+            
+                                                <button type="submit" id="delete_vendor_btn" class="btn btn-icon btn-link btn-primary btn-xs">
+                                                    <span class="fa fa-trash" style="color: white;"></span>
+                                                </button>
+                                            </div>
+                                        </div>                                    
+
+                                        <div class="card-body">
+                                            <ul class="nav nav-pills nav-secondary" id="pills-tab" role="tablist">
+                                                <li class="nav-item">
+                                                    <a class="nav-link active" id="pills-account-info-tab" data-bs-toggle="pill" href="#pills-account-info" role="tab" aria-controls="pills-account-info" aria-selected="true">Account Info</a>
+                                                </li>
+                                                <li class="nav-item parts d-none">
+                                                    <a class="nav-link" id="pills-parts-tab" data-bs-toggle="pill" href="#pills-parts" role="tab" aria-controls="pills-parts" aria-selected="false">Parts</a>
+                                                </li>
+                                                <li class="nav-item li_technical_specs not-allowed">
+                                                    <a class="nav-link disabled" id="pills-technical-specs-tab" data-bs-toggle="pill" href="#pills-technical-specs" role="tab" aria-controls="pills-technical-specs" aria-selected="false">Memo</a>
+                                                </li>
+                                            
+                                            </ul>
+
+                                            <div class="tab-content mt-2 mb-3" id="pills-tabContent">
+
+                                                <div class="tab-pane fade show active" id="pills-account-info" role="tabpanel" aria-labelledby="pills-account-info-tab">
+
+                                                    <input type="text" class="form-control" id="vendorId" hidden>
+                                                    <input type="text" class="form-control" id="userId" value="{{ user.id }}" hidden>
+
+                                                    <div class="col form-group d-flex align-items-center">
+                                                        <label for="vendor_name" style="min-width: 120px;">Vendor Name</label>
+                                                        <input type="text" class="form-control" id="vendor" disabled>
+                                                    </div>
+
+                                                    <div class="col form-group d-flex align-items-center">
+                                                        <label for="default" style="min-width: 120px;">Default</label>
+                                                        <input type="checkbox" id="default" value="true" disabled>                                                  
+                                                    </div>
+
+                                         
+                                                     <fieldset class="border rounded-3 p-3 pt-4">
+                                                        <legend> Details:</legend>
+
+                                                        <div class="col form-group d-flex align-items-center pt-4">
+                                                            <label class="ms-5" for="default" style="min-width: 120px;">Date Created: </label>
+                                                            <p id="created_at" style="min-width: 400px;"></p>
+                                                            <label class="ms-5" for="default" style="min-width: 120px;">Date Updated: </label>
+                                                            <p id="updated_at"></p>
+                                                        </div>
+
+                                                     </fieldset>
+                                                    
+                                                </div>
+                                                
+                                                <div class="tab-pane fade" id="pills-parts" role="tabpanel" aria-labelledby="pills-parts-tab">
+                                                    <div class="table-responsive parts-table pt-4">
+                                                        <table class="table display" id="parts-table">
+                                                            <thead>
+                                                                <tr class="center-align">
+                                                                    <th></th>
+                                                                    <th class="left-align"><span>Parts</span></th>
+                                                                    <th class="left-align"><span>Description</span></th>
+                                                                    <th><span>Last Cost</span></th>
+                                                                    <th><span>Uom</span></th>
+                                                                    <th><span>Vendor Number</span></th>
+                                                                    <th><span></span></th>                                                                    
+                                                                </tr>
+                        
+                                                            </thead>
+                                                            <tbody>
+                                                                
+                                                            </tbody>
+                                                            <tfoot>
+                                                                <tr>
+                                                                    <th class="left-align d-none" colspan="10">
+                                                                        <button class="btn btn-primary btn-border me-3" id="search_button" data-bs-toggle="modal" data-bs-target="#add-parts-modal"> + Add Parts Pricing </button>
+                                                                    </th>
+                                                                </tr>
+                                                            </tfoot>
+                                                        </table>
+                        
+                                                    </div>
+                                                    
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- Add vendor -->
+    <div class="modal fade" id="add-vendor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="exampleModalLabel">Add Vendor</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="col form-group d-flex align-items-center">
+                    <label for="vendor_name" style="min-width: 120px;">Vendor Name</label>
+                    <input type="text" class="form-control" id="vendor_name">
+                </div>
+                <div class="col form-group d-flex align-items-center">
+                    <label for="vendor_default" style="min-width: 120px;">Default</label>
+                    <input type="checkbox" id="vendor_default">
+                </div>
+
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+              <button type="button" id="add_vendor_btn" class="btn btn-primary">Add New Vendor</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Script -->
+    <script>
+        $(document).ready(function() {
+
+            //========================================================================================================================================
+          
+                $('#add_vendor_btn').on('click', function() {
+
+                    var vendor_name = $('#vendor_name').val();
+                    var checkboxElement = $('#vendor_default'); 
+                    var isChecked = checkboxElement.is(':checked'); 
+                    var userId = $('#userId').val();
+
+                    $('#loading-indicator').show(); 
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/vendor/add_vendor',
+                        data: {
+                            vendor: vendor_name,
+                            default: isChecked,
+                            userId : userId,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            swal("Success!", "New Vendor is Added", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "An error occurred while trying to add the vendor.",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        }
+                    });
+                });
+
+            //========================================================================================================================================
+          
+                $('#update_vendor_btn').on('click', function() {
+
+                    var vendor_id = $('#vendorId').val();
+                    var vendor_name = $('#vendor').val();
+                    var checkboxElement = $('#default'); 
+                    var isChecked = checkboxElement.is(':checked'); 
+                    var userId = $('#userId').val();
+
+                    $('#loading-indicator').show(); 
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/vendor/update_vendor',
+                        data: {
+                            vendor_name: vendor_name,
+                            vendor_id: vendor_id,
+                            default: isChecked,
+                            userId : userId,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            swal("Success!", "Vendor Updated", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000);
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            swal("Error", "Failed to update vendor", {
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000);
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        },
+                    });
+                });
+
+            //========================================================================================================================================
+              
+                $('#main_table tbody').on('click', 'tr', function() {
+
+                    $('#add_vendor').addClass('d-none');
+                    $('.btn-group').removeClass('d-none');
+                    $('li.parts').removeClass('d-none');
+                    
+                    $('#vendor').prop('disabled', false);
+                    $('#default').prop('disabled', false);
+
+                    var vendorid = $(this).data('vendor-id');
+                    var vendorname = $(this).data('vendor-name');
+                    var vendordefault = $(this).data('vendor-default');
+                    var status = $(this).data('status');
+                    var partId = $(this).data('partId');
+                    var created_at = $(this).data('created-at');
+                    var updated_at = $(this).data('updated-at');
+
+                    var isChecked;
+                    if (typeof vendordefault === 'boolean') {
+                        isChecked = vendordefault;
+                    } else if (typeof vendordefault === 'string') {
+                        isChecked = vendordefault.toLowerCase() === 'true';
+                    }
+
+                    $('#vendorId').val(vendorid);
+                    $('#partId').val(partId);
+                    $('#vendor').val(vendorname);
+                    $('#header-vendor').text(vendorname);
+                    $('#vendor_status').text(status);
+
+                    $('#created_at').text(created_at);
+                    $('#updated_at').text(updated_at);
+
+                    $('#default').val(vendordefault);
+                    $('#default').prop('checked', isChecked);
+
+                    $.ajax({
+                        url: '/admin_helpers/vendor_parts/' + vendorid + '/', 
+                        type: 'GET',
+                        success: function(response) {
+                            var tbody = $('#parts-table tbody');
+                            tbody.empty();
+                            
+                            var parts_list = [];
+                            
+                            if (response.length > 0) {
+                                $.each(response, function(index, parts) {
+                                    var vendorLastCost = parseFloat(parts.lastcost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                    var row = 
+                                    '<tr class="center-align">' +
+                                        '<td><span>' + (index + 1) + '.' + '</span></td>' + // Add the numbering here
+                                        '<td class="left-align"><span>' + parts.part_num + '</span></td>' +
+                                        '<td class="left-align"><span>' + parts.trade_name + '</span></td>' +
+                                        '<td><span>$' + vendorLastCost + '</span></td>' +
+                                        '<td><span></span></td>' +
+                                        '<td class="left-align"><span>' + parts.part_num + '</span></td>' +
+                                        '<td><div class="d-none delete-part-vendor-name" data-vendorparts-id="' + parts.id + '">' +
+                                            '<button class="btn btn-danger btn-sm delete_vendorparts" type="button">Remove</button>' +
+                                        '</div></td>' +
+                                    '</tr>';
+                                
+                                    tbody.append(row);
+                                    
+                                   // parts_list.push(parts.vendor_name);
+                                });
+                            } else {
+                                tbody.append('<tr><td colspan="10" class="text-center">No Associated Vendors found for this part.</td></tr>');
+                            }
+                            
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('Error:', error);
+                        }
+                    });
+
+                });
+
+            //========================================================================================================================================
+
+                $(document).on('click', '.delete_vendorparts', function() {
+
+                    var button = $(this);
+                    var container = button.closest('.delete-part-vendor-name');
+                    var vendorId = container.data('vendorparts-id');
+                
+                    $('#loading-indicator').show(); 
+
+                    $.ajax({
+                        url: '/vendor/delete_vendorparts/' + vendorId + '/', 
+                        type: 'POST',
+                        data: {
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                        },
+                        success: function(response) {
+                            container.closest('tr').remove();
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+        
+                                swal({
+                                    title: "Deleted!",
+                                    text: "Associated Part deleted",
+                                    icon: "success",
+                                    buttons: {
+                                        confirm: {
+                                            className: "btn btn-success",
+                                        },
+                                    },
+                                    timer: 3000 
+                                }).then(() => {
+                                    location.reload(); 
+                                });
+                            }, 500); 
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Failed to delete: " + error);
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        }
+                    });
+                });
+
+            //========================================================================================================================================
+
+                $('li.sidebar_vendors').addClass('active');
+
+            //========================================================================================================================================
+
+                $('#delete_vendor_btn').click(function(event) {
+                    event.preventDefault();
+            
+                    var vendorId = $('#vendorId').val();
+                    $('#loading-indicator').show();
+
+                    $.ajax({
+                        url: '/vendor/delete_vendor/' + vendorId + '/',
+                        type: 'POST', 
+                        data: {
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                                swal({
+                                    title: "Deleted!",
+                                    text: "Vendor deleted",
+                                    icon: "success",
+                                    buttons: {
+                                        confirm: {
+                                            className: "btn btn-success",
+                                        },
+                                    },
+                                    timer: 3000 
+                                }).then(() => {
+                                    location.reload(); 
+                                });
+                            }, 500) 
+                        },
+                        error: function(xhr, status, error) {
+                            swal("Error", "Failed to delete vendor", {
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        },
+                    });
+                });
+                
+            //========================================================================================================================================
+               
+                $('#search_button').on('click', function() {
+                    var searchValue = $('#search_partnum').val().toUpperCase();
+                    
+                    $('#main_table tbody tr').filter(function() {
+                        var name = $(this).find('td').text().toUpperCase();
+                        
+                        if (name.indexOf(searchValue) > -1 || searchValue === "") {
+                            $(this).show(); 
+                        } else {
+                            $(this).hide();
+                        }
+                    });
+                });
+            
+            //========================================================================================================================================
+                $("#main_table").DataTable({
+                    dom: '<"float-start"f>',
+
+                    aLengthMenu: [
+                        [10, 25, 50, 100, 200, -1],
+                        [10, 25, 50, 100, 200, "All"]
+                    ],
+                    iDisplayLength: -1,
+                    searching: true,
+                    paging: false,
+                    order: [],
+                });
+
+                $('#main_table_info').addClass('d-none');
+            //========================================================================================================================================
+
+        });
+
+    </script>
+  
+    <style>
+
+        .unstyled-button {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .main_table {
+            overflow-y: auto;
+            max-height: 750px;
+        }
+
+        #main_table th {
+            background-color: #F2F2F2;
+            white-space: nowrap;
+        }
+
+        #main_table_filter {
+            padding: 10px;
+        }
+
+        .parts-table {
+            overflow-y: auto;
+            max-height: 550px;
+        }
+
+        #parts-table thead th {
+            background-color: #F2F2F2;
+            white-space: nowrap;
+
+        }
+
+        #parts-table span{
+            font-size: 12px;
+        }
+        
+    </style>
+{% endblock %}

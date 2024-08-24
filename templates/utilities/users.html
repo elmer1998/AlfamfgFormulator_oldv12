@@ -1,0 +1,550 @@
+{% extends "admin.html" %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <div class="container-fluid ">
+            <div class="white">
+
+                <div class="d-flex align-items-center justify-content-between users">
+                    <button class="btn" onclick="history.back()" style="background-color: darkgreen">
+                        <i class="fas fa-arrow-left"></i> &nbsp;
+                    </button>  &nbsp;
+
+                    <h5 class="my-0" style="font-size: 16px; font-weight: bold; margin-right: auto;">User Management</h5>
+                    
+                    <div>
+                        <button class="btn" id="addUserBtn" style="font-size: 12px;">+ Add User</button>
+                    </div>
+                </div>
+                
+                <div class="table-container white">
+                    <table class="table" id="main_table">
+                        <thead>
+                            <tr class="center-align">
+                                <th scope="col"></th>
+                                <th scope="col" class="left-align">User</th>
+                                <th scope="col">Date Registered</th>
+                                <th scope="col">Last Login</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in user_data %}
+                            <tr class="center-align">
+                                <td> 
+                                    <span id="userInitials" class="rounded-circle" style="height: 40px; width: 40px; line-height: 40px; text-align: center; background-color: #f0f0f0; color: #333; border-radius: 50%; display: inline-block; font-size: 14px; font-weight: bold;">{{ user.user_initials }}</span>
+                                </td>
+                                <td class="left-align">
+                                    {{ user.first_name }} {{ user.last_name }} <br>
+                                    {{ user.email }}
+                                </td>
+                                <td>
+                                    {{ user.date_joined|date:"m/d/Y h:i A" }}
+                                </td>                                
+                                <td>
+                                    {{ user.last_login|date:"m/d/Y h:i A" }}
+                                </td>                                   
+                                <td>
+                                    <button class="btn {% if user.status == 'Approved' %}btn-primary{% else %}btn-danger{% endif %}">
+                                        {{ user.status }}
+                                    </button>
+                                </td>                                    
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <button class="btn btn-info me-2 editUserBtn" data-user-id="{{ user.id }}" data-user-firstname="{{ user.first_name }}" data-user-lastname="{{ user.last_name }}" data-user-username="{{ user.username }}" data-user-email="{{ user.email }}" data-user-status="{{ user.status }}">
+                                            <i class="fas fa-pen"></i> 
+                                        </button>
+                                        <button class="btn btn-danger deleteUserBtn" data-user-id="{{ user.id }}">
+                                            <i class="fas fa-trash"></i> 
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <br>
+            </div>
+        </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+    <!-- ADD User MODAL -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-contents">
+          <span class="close">&times;</span>
+          <p style="font-weight: bold; font-size: 16px;">Add User</p> 
+          <hr>
+          <div class="modal-body">
+                <form action="{% url "add_user" %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-container">
+
+                        <div class="input-group">
+                            <span class="input-group-text">First Name</span>
+                            <input type="text" name="first_name" class="form-control uniform-size" required>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Last Name </span>
+                            <input type="text" name="last_name" class="form-control uniform-size" required>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Username</span>
+                            <input type="text" name="username" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" name="email" class="form-control uniform-size" required>
+                        </div>
+
+                        <input type="text" value="alfam123" name="password" class="form-control uniform-size" hidden>
+                        <hr>
+                        <button class="btn btn-primary" id="createFolderBtn" type="submit">Apply</button>
+                    </div>
+                </form>
+          </div>
+        </div>
+    </div>
+
+    <!-- Edit User MODAL -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-contents">
+            <span class="close">&times;</span>
+            <p style="font-weight: bold; font-size: 16px;">Edit User</p> 
+            <hr>
+            <div class="modal-body">
+                <form action="{% url "update_user" %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-container">
+
+                        <input type="text" id="user_id" name="user_id" class="form-control uniform-size" hidden>
+
+                        <div class="input-group">
+                            <span class="input-group-text">First Name</span>
+                            <input type="text" id="first_name" name="first_name" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Last Name </span>
+                            <input type="text" id="last_name" name="last_name" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Username</span>
+                            <input type="text" id="username" name="username" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" id="email" name="email" class="form-control uniform-size">
+                        </div>
+                        <hr>
+                        <div class="input-group">
+                            <span class="input-group-text">Status</span>
+                            <select id="status" name="status" class="form-select uniform-size" style="padding: 10px;">
+                                <option value="Approved">Approved</option>
+                                <option value="Not Approved">Not Approved</option>
+                            </select>
+                        </div>
+
+                        <input type="text" id="password" value="alfam123" name="password" class="form-control uniform-size" hidden>
+                        <hr>
+
+                        <button class="btn btn-primary" id="createFolderBtn" type="submit">Apply</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap JS -->
+
+    <!-- Script -->
+    <script>
+        $(document).ready(function() {
+
+            //========================================================================================================================================
+            var $addUsermodal = $("#addUserModal");
+            var $addUserbtn = $("#addUserBtn");
+            var $addUserspan = $(".close");
+
+            $addUserbtn.on("click", function() {
+                $addUsermodal.show();
+            });
+
+            $addUserspan.on("click", function() {
+                $addUsermodal.hide();
+            }); 
+
+            //========================================================================================================================================
+           
+            function openTab(tabName) {
+                $('.tabcontent').hide();
+                $('#' + tabName).show();
+                $('.tablinks').removeClass('active');
+                $('button[data-tab="' + tabName + '"]').addClass('active');
+            }
+    
+            openTab('AddFormula');
+    
+            $('.tablinks').on('click', function(event) {
+                var tabName = $(this).data('tab');
+                openTab(tabName);
+            });
+
+            //========================================================================================================================================
+           
+            var $deleteUserBtn = $(".deleteUserBtn");
+
+            $deleteUserBtn.on("click", function() {
+                var userId = $(this).data('user-id');
+        
+                if (confirm("Confirm deleting the User?")) {
+                    $.ajax({
+                        url: 'delete_user/' + userId + '/',
+                        method: 'DELETE',
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                        success: function(response) {
+                            window.location.reload();  
+                        },
+                        error: function(error) {
+                            console.error("Error deleting formula:", error);
+                        }
+                    });
+                }
+            });
+
+            //========================================================================================================================================
+          
+            var $editUserModal = $("#editUserModal");
+            var $editUserBtn = $(".editUserBtn");
+            var $editUserSpan = $(".close");
+
+            $editUserBtn.on("click", function() {
+
+                var passed_user_id = $(this).data('user-id');
+                var passed_user_firstname = $(this).data('user-firstname');
+                var passed_user_lastname = $(this).data('user-lastname');
+                var passed_user_username= $(this).data('user-username');
+                var passed_user_email = $(this).data('user-email');
+                var passed_status = $(this).data('user-status');
+
+                console.log(passed_status);
+
+                $('#user_id').val(passed_user_id);
+                $('#first_name').val(passed_user_firstname);
+                $('#last_name').val(passed_user_lastname);
+                $('#email').val(passed_user_email);
+                $('#username').val(passed_user_username);
+                $('#status').val(passed_status);
+
+                $editUserModal.show();
+
+            });
+
+            $editUserSpan.on("click", function() {
+                $editUserModal.hide();
+            }); 
+
+            $(window).click(function(event) {
+                if (event.target.id === 'editUserModal') {
+                    $editUserModal.hide();
+                }
+            });
+            //========================================================================================================================================
+            
+                $('a.users_menu').removeClass('faded');
+                $('a.utilitiesSubmenu').removeClass('faded');
+                $('div.util-collapse').addClass('show');
+
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+
+
+         });
+
+    </script>
+
+
+    <!-- Style -->
+    <style>
+        .unstyled-button {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            margin: 0 5px; 
+        }
+
+        .form-select {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .uniform-size {
+            width: 100%;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 11px;
+
+        }
+        
+        .uniform-size:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 11px;
+        }
+        
+        .input-group-text {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px 0 0 4px;
+            padding: 10px;
+            font-size: 11px;
+            width: 75px;
+        }
+        
+        .form-control {
+            flex: 1; /* Takes remaining space */
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 0 4px 4px 0;
+            box-sizing: border-box;
+            font-size: 11px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-contents {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 20%;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-body input {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #wrapper {
+            display: flex;
+        }
+
+        #sidebar-wrapper {
+            width: 250px;
+            height: 10px;
+            font-size: 12px;
+            margin-left: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #page-content-wrapper {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .users {
+            background-color: darkgreen;
+            padding: 8px;
+            color: white;
+        }
+
+        body {
+            background-color: #e3f2fd;
+            font-family: Arial;
+        }
+
+        .white {
+            background-color: white;
+        }
+
+        .btn {
+            font-size: 11px;
+            color: white;
+        }
+
+        .table-container {
+            font-size: 12px;
+            margin: 12px;
+
+        }
+
+        #myTabs {
+            margin: 0;
+            padding: 0;
+            border: 1px solid #dee2e6;
+            font-size: 12px;
+
+        }
+
+        .hides {
+            display: none;
+        }
+
+        .center-align {
+            text-align: center;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        .left-align {
+            text-align: left;
+        }
+
+        #main_table {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-collapse: collapse;
+
+        }
+
+        #main_table th {
+            background-color: #F2F2F2;
+        }
+
+        #main_table td {
+            vertical-align: middle;
+        }
+
+        #main_table th:not(:first-child):not(:last-child),
+        #main_table td:not(:first-child):not(:last-child) {
+            width: 20%; 
+        }
+        
+        #main_table th:first-child,
+        #main_table td:first-child,
+        #main_table th:last-child,
+        #main_table td:last-child {
+            width: 6%;
+        }
+
+        #main_table td:first-child,
+        #main_table td:last-child {
+            padding: 15px;
+        }
+
+
+        .faded {
+            opacity: 0.5;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
+        }
+
+        .button-cell {
+            text-align: center; 
+            vertical-align: middle; 
+            height: 100%; 
+        }
+        
+        .button-container {
+            display: inline-block; 
+            vertical-align: middle;
+        }
+
+      .inci {
+            word-wrap: break-word; 
+            white-space: normal; 
+            margin: 0;
+            padding: 0;
+            line-height: 2em;
+        }
+
+        .large-dot {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+
+    </style>
+{% endblock %}

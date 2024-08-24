@@ -1,0 +1,286 @@
+{% extends "admin.html" %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="page-inner">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-round">
+                        
+                        <div class="card-header">
+                            <div class="card-head-row card-tools-still-right">
+                                <a href="/admin/formula">
+                                    <button class="btn">
+                                        <i class="fas fa-arrow-left"></i> &nbsp;
+                                    </button>  &nbsp;
+                                </a>
+                                
+                                <p class="card-title ms-3" style="color: black; font-size: 16px;">{{ formula.brand_name }} - {{ formula.formula_name }}</p>
+                                
+                                <div class="card-tools">
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs d-none" >
+                                        <span class="fa fa-angle-down"></span>
+                                    </button>
+
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card d-none">
+                                        <span class="fa fa-sync-alt"></span>
+                                    </button>
+
+                                    <a href="#" class="d-none">
+                                        <button class="btn" style="background-color: lightgreen; opacity: 0.6em; color: black;">Save Changes</button>
+                                    </a>
+
+                                </div>
+                            </div>
+
+                            <p class="card-category d-none">
+                                Map of the distribution of users around the world
+                            </p>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 d-flex">
+                        
+                                    <!-- Sidebar 1 -->
+                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-1" style="width: 6.5rem;">
+                                        <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                                            <!-- Nav items here -->
+                                        </ul>
+                                    </div>
+                                    
+                                    <!-- Sidebar 2 -->
+                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-2" id="custom-siderbar-2" style="width: 28em;">
+                                        <div class="ms-3 pt-2" style="max-height: 720px; height: 720px; overflow-y: auto;">
+                                            <!-- Form content here -->
+                                        </div>
+                                    </div>
+                        
+                                </div>
+                        
+                                <!-- Toggle Button -->
+                                <div class="col-md-1 d-flex justify-content-center align-items-center">
+                                    <button class="btn btn-primary" id="toggle-sidebar">Toggle Sidebar</button>
+                                </div>
+                        
+                                <!-- Table Section -->
+                                <div class="col-md-7" id="table-section">
+                                    <div class="table-responsive table-hover">
+                                        <table class="table display" id="main_table">
+                                            <thead>
+                                                <tr>
+                                                    <!-- Table headers here -->
+                                                </tr>
+                                            </thead>
+                                            <tbody> 
+                                                {% for associated_ingredient in associated_ingredients %}
+                                                    <tr>
+                                                        <td scope="col">{{ associated_ingredient.sortOrder }}</td>
+                                                        <td scope="col">{{ associated_ingredient.ingredient_name }}</td>
+                                                        <!-- Table data here -->
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- jQuery for Toggle Action -->
+                        <script>
+                            $(document).ready(function(){
+                                $('#toggle-sidebar').click(function(){
+                                    $('#custom-siderbar-2').toggle();
+                                    
+                                    // Adjust the table width when sidebar is hidden/shown
+                                    if($('#custom-siderbar-2').is(':visible')){
+                                        $('#table-section').removeClass('col-md-12').addClass('col-md-7');
+                                    } else {
+                                        $('#table-section').removeClass('col-md-7').addClass('col-md-12');
+                                    }
+                                });
+                            });
+                        </script>
+                        
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+        //=======================================================================================================================================
+
+            var $anchor = $('li.formula');
+            $anchor.addClass('active');
+
+        //=======================================================================================================================================
+
+            $('.customSelect').select2({
+                theme: 'bootstrap',   
+                width: 'resolve',
+            });
+            
+        //========================================================================================================================================
+          
+            $('#category-select').change(function(){
+                var categoryId = $(this).val();
+                $.ajax({
+                    url: '{% url "get_subcategories" %}',
+                    data: {
+                        'category_id': categoryId
+                    },
+                    success: function(data){
+                        var subcategorySelect = $('#subcategory-select');
+                        subcategorySelect.empty();
+                        subcategorySelect.append('<option value="default"></option>');
+                        data.forEach(function(subcategory){
+                            subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.subcategory_name + '</option>');
+                        });
+                    }
+                });
+            });
+
+        //========================================================================================================================================
+           
+            $('#subcategory-select').change(function(){
+                var subcategoryId = $(this).val();
+                $.ajax({
+                    url: '{% url "get_producttypes" %}',
+                    data: {
+                        'subcategory_id': subcategoryId
+                    },
+                    success: function(data){
+                        var producttypeSelect = $('#product_type');
+                        producttypeSelect.empty();
+                        producttypeSelect.append('<option value="default"></option>');
+                        data.forEach(function(producttype){
+                            producttypeSelect.append('<option value="' + producttype.id + '">' + producttype.product_type + '</option>');
+                        });
+                    }
+                });
+            });
+           
+        //========================================================================================================================================
+            
+            $('#update_formula').on('submit', function(event) {
+                    event.preventDefault(); // Prevent the default form submission
+                    
+                    var formData = $(this).serialize();
+                    $('#loading-indicator').show();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/admin/update_formula', 
+                        data: formData,
+                        success: function(response) {
+                            swal("Success!", " Formula succesfully updated", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "An error occurred while trying to update the formula.",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        }
+                    });
+                });
+            
+        //========================================================================================================================================
+         
+            $('#clear-all-btn').on('click', function() {
+                // Clear all input fields
+                $('#update_formula').find('input[type="text"]').val('');
+                
+                // Clear all select fields
+                $('#update_formula').find('select').prop('selectedIndex', 0);
+                
+                // Clear multi-select fields
+                $('#product_qualities').val([]).change();
+            });
+            
+        //========================================================================================================================================
+        //========================================================================================================================================
+        //========================================================================================================================================
+
+
+         });
+
+    </script>
+
+    <style>
+        
+        .custom-siderbar-1 i {
+            font-size: 24px;
+        }
+        .custom-siderbar-1 span {
+            font-size: 12px;
+        }
+
+        .sub-content-area {
+            background-color: #F8F9FA;
+            height: 10vh;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .select2-container--bootstrap .select2-selection--single {
+            height: 40px; !important;
+        }
+        
+        .select2-container--bootstrap .select2-results__option {
+            padding: 10px !important;
+        }
+        
+        .select2-container--bootstrap .select2-dropdown {
+            padding: 10px !important;
+        }
+        
+        .select2-container--bootstrap .select2-search__field {
+            padding: 8px !important;
+        }
+        
+        #main_table thead th {
+            background-color: #F2F2F2;
+            white-space: nowrap;
+
+        }
+    </style>
+{% endblock %}

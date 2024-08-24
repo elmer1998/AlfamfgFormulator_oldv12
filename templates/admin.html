@@ -1,0 +1,469 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Alfamfg Formulator</title>
+    <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
+    <link rel="icon" href="{% static 'assets/img/alfaicon.jpg' %}"type="image/x-icon"/>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+    
+    <!-- Fonts and icons -->
+    <script src="{% static 'assets/js/plugin/webfont/webfont.min.js' %}"></script>
+    <script>
+      WebFont.load({
+        google: { families: ["Public Sans:300,400,500,600,700"] },
+        custom: {
+          families: [
+            "Font Awesome 5 Solid",
+            "Font Awesome 5 Regular",
+            "Font Awesome 5 Brands",
+            "simple-line-icons",
+          ],
+          urls: ["{% static 'assets/css/fonts.min.css' %}"],
+        },
+        active: function () {
+          sessionStorage.fonts = true;
+        },
+      });
+    </script>
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/plugins.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/kaiadmin.min.css' %}" />
+    
+    <!-- CSS Just for demo purpose, don't include it in your project -->
+    <link rel="stylesheet" href="{% static 'assets/css/demo_v1.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}" />
+
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
+    
+  </head>
+  <body>
+    
+    <style>
+        .card-title {
+            color: white;
+            font-size: 14px;
+        }
+    </style>
+
+    <div class="wrapper">
+      <!-- Sidebar -->
+      <div class="sidebar" data-background-color="dark">
+
+        <div class="sidebar-logo">
+          <!-- Logo Header -->
+          <div class="logo-header" data-background-color="dark">
+            <a href="/admin/dashboard" class="logo">
+              <img src="{% static 'assets/img/alfam_white.png' %}" alt="navbar brand" class="navbar-brand" width="140" height="50" />
+            </a>
+            <div class="nav-toggle">
+              <button class="btn btn-toggle toggle-sidebar">
+                <i class="gg-menu-right"></i>
+              </button>
+              <button class="btn btn-toggle sidenav-toggler">
+                <i class="gg-menu-left"></i>
+              </button>
+            </div>
+            <button class="topbar-toggler more">
+              <i class="gg-more-vertical-alt"></i>
+            </button>
+          </div>
+          <!-- End Logo Header -->
+        </div>
+
+        <div class="sidebar-wrapper scrollbar scrollbar-inner">
+          <div class="sidebar-content">
+            <ul class="nav nav-secondary">
+                
+              <li class="nav-item">
+                <a href="/admin/dashboard">
+                  <i class="fas fa-home"></i>
+                  <p>Dashboard</p>
+                  <span class="caret d-none"></span>
+                </a>
+              </li>
+
+                <li class="nav-section">
+                    <span class="sidebar-mini-icon">
+                    <i class="fa fa-ellipsis-h"></i>
+                    </span>
+                    <h4 class="text-section">Components</h4>
+                </li>
+              
+                <li class="nav-item formula">
+                    <a href="/admin/formula">
+                        <i class="fas fa-desktop"></i>
+                        <p>Formula</p>
+                        <span class="badge badge-success d-none">4</span>
+                    </a>
+                </li>
+
+                <li class="nav-item sidebar_parts_inventory">
+                    <a data-bs-toggle="collapse" href="#parts_inventory_nav">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Parts Inventory</p>
+                        <span class="caret"></span>
+                    </a>
+                    
+                    <div class="collapse" id="parts_inventory_nav">
+                        <ul class="nav nav-collapse">
+                            <li>
+                                <a href="/parts/parts_inventory">
+                                    <span class="sub-item">All Parts Category</span>
+                                </a>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="nav-item sidebar_vendors">
+                    <a href="/vendor/vendors">
+                        <i class="fas fa-warehouse"></i>
+                        <p>Vendor</p>
+                        <span class="badge badge-success d-none">4</span>
+                    </a>
+                </li>
+
+                <li class="nav-item sidebar_inci d-none">
+                    <a href="/admin/inci_names">
+                        <i class="fas fa-flask"></i>
+                        <p>Inci Names</p>
+                        <span class="badge badge-success d-none">4</span>
+                    </a>
+                </li>
+
+                <li class="nav-item sidebar_ingredients d-none">
+                    <a data-bs-toggle="collapse" href="#ingredients_nav">
+                        <i class="fas fa-layer-group"></i>
+                        <p>Ingredients</p>
+                        <span class="caret"></span>
+                    </a>
+                    
+                    <div class="collapse" id="ingredients_nav">
+                        <ul class="nav nav-collapse">
+                            <li class="li_inci_names">
+                                <a href="/admin/inci_names">
+                                    <span class="sub-item">INCI Names</span>
+                                </a>
+                            </li>
+                            <li class="li_allergens">
+                                <a href="#">
+                                    <span class="sub-item">Allergens</span>
+                                </a>
+                            </li>
+                            <li class="li_impurities">
+                                <a href="#">
+                                    <span class="sub-item">Impurities</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+                
+                <li class="nav-item d-none">
+                    <a data-bs-toggle="collapse" href="#forms">
+                        <i class="fas fa-wrench"></i>
+                        <p>Utilites</p>
+                        <span class="caret"></span>
+                    </a>
+                    
+                    <div class="collapse" id="forms">
+                        <ul class="nav nav-collapse">
+                            <li>
+                                <a href="/utilities/registered_users">
+                                    <span class="sub-item">Users</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/categories">
+                                    <span class="sub-item">Categories</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/subcategories">
+                                    <span class="sub-item">Subcategories</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/product_type">
+                                    <span class="sub-item">Product Type</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/product_format">
+                                    <span class="sub-item">Product Format</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/product_qualities">
+                                    <span class="sub-item">Product Qualities</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/compliance">
+                                    <span class="sub-item">Compliance</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/applications">
+                                    <span class="sub-item">Applications</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/certifications">
+                                    <span class="sub-item">Certifications</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/utilities/functions">
+                                    <span class="sub-item">Functions</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                </li>
+
+            </ul>
+
+          </div>
+        </div>
+      </div>
+      <!-- End Sidebar -->
+
+      <div class="main-panel">
+        <div class="main-header">
+            <div class="main-header-logo">
+                <!-- Logo Header -->
+                <div class="logo-header" data-background-color="dark">
+                    <a href="index.html" class="logo">
+                    <img src="{% static 'assets/img/alfam_white.png' %}" alt="navbar brand" class="navbar-brand" width="140" height="50" />
+                    </a>
+                    <div class="nav-toggle">
+                        <button class="btn btn-toggle toggle-sidebar">
+                            <i class="gg-menu-right"></i>
+                        </button>
+                        <button class="btn btn-toggle sidenav-toggler">
+                            <i class="gg-menu-left"></i>
+                        </button>
+                    </div>
+                    <button class="topbar-toggler more">
+                    <i class="gg-more-vertical-alt"></i>
+                    </button>
+                </div>
+                <!-- End Logo Header -->
+            </div>
+            
+          <!-- Navbar Header -->
+          <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+            <div class="container-fluid">
+
+                <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
+                    <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none" >
+                        <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false"  aria-haspopup="true">
+                            <i class="fa fa-search"></i>
+                        </a>
+                    
+                        <ul class="dropdown-menu dropdown-search animated fadeIn">
+                            <form class="navbar-left navbar-form nav-search">
+                                <div class="input-group">
+                                    <input type="text" placeholder="Search ..." class="form-control"/>
+                                </div>
+                            </form>
+                        </ul>
+                    </li>
+
+                    <li class="nav-item topbar-user dropdown hidden-caret">
+                        <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+                            <div class="avatar-sm">
+                                <span id="userInitials" class="rounded-circle" style="height: 40px; width: 40px; line-height: 40px; text-align: center; background-color: #f0f0f0; color: #333; border-radius: 50%; display: inline-block; font-size: 14px; font-weight: bold;">{{ initials }}</span>
+                            </div>
+                            <span class="profile-username">
+                                <span class="fw-bold">{{ user.last_name }}</span>
+                            </span>
+                        </a>
+
+                    <ul class="dropdown-menu dropdown-user animated fadeIn">
+                        <div class="dropdown-user-scroll scrollbar-outer">
+                        <li>
+                                <div class="user-box">
+                                    <div class="avatar-lg">
+                                        <span id="userInitials" class="rounded-circle" style="height: 40px; width: 40px; line-height: 40px; text-align: center; background-color: #f0f0f0; color: #333; border-radius: 50%; display: inline-block; font-size: 14px; font-weight: bold;">{{ initials }}</span>
+                                    </div>
+                                    <div class="u-text">
+                                        <h4>{{ user.last_name }}</h4>
+                                        <p class="text-muted">{{ user.email }}</p>
+                                        <a href="#" class="btn btn-xs btn-secondary btn-sm d-none">View Profile</a>
+                                    </div>
+                                </div>
+                        </li>
+
+                            <li>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">My Profile</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#">Account Setting</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="/signout">Logout</a>
+                            </li>
+                        </div>
+                    </ul>
+                    
+                    </li>
+                </ul>
+
+            </div>
+          </nav>
+          <!-- End Navbar -->
+        </div>
+
+        <div class="container d-none">
+            <div class="page-inner">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card card-round">
+                            
+                            <div class="card-header">
+                                <div class="card-head-row card-tools-still-right">
+                                    <h4 class="card-title">Users Geolocation</h4>
+                                    <div class="card-tools">
+                                        <button class="btn btn-icon btn-link btn-primary btn-xs" >
+                                            <span class="fa fa-angle-down"></span>
+                                        </button>
+
+                                        <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card">
+                                            <span class="fa fa-sync-alt"></span>
+                                        </button>
+
+                                        <button class="btn btn-icon btn-link btn-primary btn-xs">
+                                            <span class="fa fa-times"></span>
+                                        </button>
+
+                                    </div>
+                                </div>
+
+                                <p class="card-category">
+                                    Map of the distribution of users around the world
+                                </p>
+                            </div>
+
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="table-responsive table-hover table-sales">
+                                           
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mapcontainer">
+                                            <div id="world-map" class="w-100" style="height: 300px"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        {% block content %}
+        <!-- Default content -->
+        {% endblock %}
+        
+        <div id="loading-indicator" style="display: none;">
+            <img src="{% static 'assets/img/spinner.gif' %}">
+        </div>
+    
+        <footer class="footer d-none">
+          <div class="container-fluid d-flex justify-content-between">
+            <nav class="pull-left">
+              <ul class="nav">
+                <li class="nav-item">
+                  <a class="nav-link" href="http://www.themekita.com">
+                    ThemeKita
+                  </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#"> Help </a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#"> Licenses </a>
+                </li>
+              </ul>
+            </nav>
+
+            <div class="copyright">
+              2024, made with <i class="fa fa-heart heart text-danger"></i> by
+              <a href="http://www.themekita.com">ThemeKita</a>
+            </div>
+            <div>
+              Distributed by
+              <a target="_blank" href="https://themewagon.com/">ThemeWagon</a>.
+            </div>
+          </div>
+        </footer>
+      </div>
+
+    </div>
+
+    <script>
+        $('.btn-refresh-card').click(function(e) {
+            location.reload();
+        });
+    </script>
+
+    <!--   Core JS Files   -->
+
+    <script src="{% static 'assets/js/core/jquery-3.7.1.min.js' %}"></script>
+    <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
+    <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
+    
+    <!-- jQuery Scrollbar -->
+    <script src="{% static 'assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js' %}"></script>
+    
+    <!-- Chart JS -->
+    <script src="{% static 'assets/js/plugin/chart.js/chart.min.js' %}"></script>
+    
+    <!-- jQuery Sparkline -->
+    <script src="{% static 'assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js' %}"></script>
+    
+    <!-- Chart Circle -->
+    <script src="{% static 'assets/js/plugin/chart-circle/circles.min.js' %}"></script>
+    
+    <!-- Datatables -->
+    <script src="{% static 'assets/js/plugin/datatables/datatables.min.js' %}"></script>
+    
+    <!-- Bootstrap Notify -->
+    <script src="{% static 'assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js' %}"></script>
+    
+    <!-- jQuery Vector Maps -->
+    <script src="{% static 'assets/js/plugin/jsvectormap/jsvectormap.min.js' %}"></script>
+    <script src="{% static 'assets/js/plugin/jsvectormap/world.js' %}"></script>
+    
+    <!-- Sweet Alert -->
+    <script src="{% static 'assets/js/plugin/sweetalert/sweetalert.min.js' %}"></script>
+    
+    <!-- Kaiadmin JS -->
+    <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
+    
+    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
+    <script src="{% static 'assets/js/setting-demo.js' %}"></script>
+    <script src="{% static 'assets/js/demos.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/js/multi-select-tag.js"></script>
+
+  </body>
+</html>

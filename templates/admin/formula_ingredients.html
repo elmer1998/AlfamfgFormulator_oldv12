@@ -1,0 +1,522 @@
+{% extends "admin.html" %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="page-inner">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-round">
+                        
+                        <div class="card-header">
+                            <div class="card-head-row card-tools-still-right">
+                                <a href="/admin/formula">
+                                    <button class="btn">
+                                        <i class="fas fa-arrow-left"></i> &nbsp;
+                                    </button>  &nbsp;
+                                </a>
+                                
+                                <p class="card-title ms-3" style="color: black; font-size: 16px;">{{ formula.brand_name }} - {{ formula.formula_name }}</p>
+                                
+                                <div class="card-tools">
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs d-none" >
+                                        <span class="fa fa-angle-down"></span>
+                                    </button>
+
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card d-none">
+                                        <span class="fa fa-sync-alt"></span>
+                                    </button>
+
+                                    <a href="#" class="d-none">
+                                        <button class="btn" style="background-color: lightgreen; opacity: 0.6em; color: black;">Save Changes</button>
+                                    </a>
+
+                                </div>
+                            </div>
+
+                            <p class="card-category d-none">
+                                Map of the distribution of users around the world
+                            </p>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 d-flex" id="sidebar-container">
+
+                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-1" style="width: 6.5rem;">
+                                        <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="/admin/edit_formula/{{ formula.id }}" class="nav-link py-3 border-bottom" aria-current="page" title="Formula" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <br>
+                                                    <span>Formula</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item">
+                                                <a href="/admin/formula/{{ formula.id }}/ingredient" class="nav-link py-3 border-bottom" aria-current="page" title="Ingredients" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-solid fa-tint"></i>                                              
+                                                    <br>
+                                                    <span>Ingredients</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Notes" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-sticky-note"></i>
+                                                    <br>
+                                                    <span>Formula <br> Notes</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Archives" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-solid fa-archive"></i>
+                                                    <br>
+                                                    <span>Archives</span>
+                                                </a>
+                                            </li>
+
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Regulatory Info" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-file"></i> 
+                                                    <br>
+                                                    <span>Regulatory <br> Info </span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Document" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-address-book"></i>
+                                                    <br>
+                                                    <span>Formula <br> Document </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-2" id="custom-siderbar-2" style="width: 28rem;">
+
+                                        <div class="d-flex mt-2 justify-content-center d-none">
+                                            <ul class="nav nav-pills nav-secondary" id="pills-tab" role="tablist">
+                                                <li class="nav-item li-manual">
+                                                    <a class="nav-link active" id="pills-manual-tab" data-bs-toggle="pill" href="#pills-manual" role="tab" aria-controls="pills-manual" aria-selected="true">Manual Adding </a>
+                                                </li>
+                                                <li class="nav-item li-existing">
+                                                    <a class="nav-link" id="pills-existing-tab" data-bs-toggle="pill" href="#pills-existing" role="tab" aria-controls="pills-existing" aria-selected="false">Existing Ingredients</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="tab-content ms-3 pt-2" id="pills-tabContent"  style="max-height: 720px; height: 720px; overflow-y: auto;">
+
+                                            <div class="tab-pane fade show active" id="pills-manual" role="tabpanel" aria-labelledby="pills-manual-tab">
+                                                <form id="add_ingredients">
+                                                    {% csrf_token %}
+                                                    <input type="text" class="form-control" id="formula_id" name="formula_id" value="{{ formula.id }}" placeholder="" style="background-color: #363636; color: #959595; border: none; font-size: 12px;" hidden>
+
+                                                    <div class="form-group">
+                                                        <label for="ingredient_name">Ingredient Name </label>
+                                                        <textarea class="form-control" id="ingredient_name" rows="15" name="ingredient_name">{{ ingredient_names }}</textarea>
+                                                    </div>                                                                            
+                                                    
+                                                    <div class="sub-content-area" style="padding: 20px;">
+                                                        <div class="d-flex justify-content-around">
+                                                            <button class="btn btn-refresh-card" type="button">Refresh</button>
+                                                            <button class="btn" type="submit"> Apply</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+
+                                                <div class="staging-form d-none">
+                                                    <form id="stage-form">
+                                                        {% csrf_token %}
+                                                        <div class="row mb-3">
+                                                            <label for="ingredient" class="col-sm-2 col-form-label">Ingredient</label>
+                                                            <div class="col-sm-10">
+                                                                <input type="text" name="ingredient_id" class="form-control" id="ingredientId" hidden>
+                                                                <input type="text" class="form-control" id="ingredient" disabled>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row mb-3">
+                                                            <label for="stage" class="col-sm-2 col-form-label">Stage</label>
+                                                            <div class="col-sm-10">
+                                                                <select id="staging" name="staging_id" class="form-select text-uppercase">
+                                                                    {% if staging %}
+                                                                        {% for stage in staging %}
+                                                                            <option value="{{ stage.id }}" {% if stage.id|stringformat:"i" == staging_id|stringformat:"i" %}selected{% endif %}>{{ stage.name }}</option>
+                                                                        {% endfor %}
+                                                                    {% endif %}
+                                                                </select>                                                                                                                          
+                                                            </div>
+                                                        </div>
+
+                                                        <button type="submit" class="btn btn-info mt-2">Apply</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+
+                                            <div class="tab-pane fade" id="pills-existing" role="tabpanel" aria-labelledby="pills-existing-tab">
+                                               
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Toggle Button -->
+                                    <div class="sidebar-toggle-icon d-flex flex-column flex-shrink-0 justify-content-center align-items-center bg-light" style="width: 2.5em; padding: 10px;">
+                                        <i id="toggle-sidebar" class="icon-arrow-left" style="font-size: 12px; cursor: pointer; border: 1px solid #ccc; padding: 30px 10px; border-radius: 50px;"></i>
+                                    </div>
+
+                                </div>
+                            
+                                <div class="col-md-8" id="table-container">
+                                    <div class="table-responsive table-hover main_table">
+                                        <table class="table display table-hover" id="main_table" role="grid">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align" scope="col">Item#</th>
+                                                    <th scope="col">Ingredient Name</th>
+                                                    <th scope="col"></th>
+                                                    <th scope="col">Concentration</th>
+                                                    <th scope="col">Warning Flags</th>
+                                                    <th style="width: 10px; text-align: right;" scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="sortable-body">
+                                                {% for stage, ingredients in ingredients_by_stage.items %}
+                                                    <tr class="table-info">
+                                                        <th colspan="6" class="text-uppercase"><strong>Stage: &nbsp; &nbsp; &nbsp; {{ stage.description }}</strong></th>
+                                                    </tr>
+                                                    {% for ingredient in ingredients %}
+                                                        <tr data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
+                                                            <td class="center-align" scope="col">{{ ingredient.sortOrder }}</td>
+                                                            <td scope="col">{{ ingredient.ingredient_name }}</td>
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>    
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                        
+                                                <!-- Display ingredients with no stage first -->
+                                                {% if no_stage_ingredients %}
+                                                    <tr class="table-info">
+                                                        <th colspan="6" class="text-uppercase"><strong>No Stage</strong></th>
+                                                    </tr>
+                                                    {% for ingredient in no_stage_ingredients %}
+                                                        <tr data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
+                                                            <td class="center-align" scope="col">{{ ingredient.sortOrder }}</td>
+                                                            <td scope="col">{{ ingredient.ingredient_name }}</td>
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>    
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </tbody>
+                                        </table>                                                                         
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            //=======================================================================================================================================
+
+                var $anchor = $('li.formula');
+                $anchor.addClass('active');
+
+            //========================================================================================================================================
+                
+                $('#add_ingredients').on('submit', function(event) {
+                    event.preventDefault();
+                    
+                    var formData = $(this).serialize();
+                    $('#loading-indicator').show();
+                
+                    $.ajax({
+                        url: '{% url "add_ingredient" formula_id=formula.id %}',
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            swal({
+                                title: "Success!",
+                                text: "",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    }
+                                }
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000); 
+                            });
+                        },
+                        error: function(xhr, errmsg, err) {
+                            swal({
+                                title: "Error!",
+                                text: 'Possible Error: ' + '\n' + '* Internal Server Error' + '\n' + '* Data Duplication',
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    }
+                                }
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000); 
+                            });
+                        },
+                    });
+                });
+                
+            //========================================================================================================================================
+               
+                $('#toggle-sidebar').click(function() {
+                    console.log('...');
+
+                    if ($('#custom-siderbar-2').is(':visible')) {
+
+                        $('#custom-siderbar-2').animate({ width: 'toggle' }, 300, function() {
+                            $(this).addClass('d-none');
+                            $('#table-container').removeClass('col-md-8').addClass('col-md-11');
+                            $('#sidebar-container').removeClass('col-md-4').addClass('col-md-1'); 
+                            
+                        });
+
+                        $(this).removeClass('icon-arrow-left').addClass('icon-arrow-right');
+
+                    } else {
+                        $('#custom-siderbar-2').removeClass('d-none').animate({ width: 'toggle' }, 50, function() {
+                            $('#table-container').removeClass('col-md-11').addClass('col-md-8');
+                            $('#sidebar-container').removeClass('col-md-1').addClass('col-md-4');
+                        });
+
+                        $(this).removeClass('icon-arrow-right').addClass('icon-arrow-left');
+
+                    }
+
+                });
+
+            //========================================================================================================================================
+               
+                $('#main_table tbody').on('click', 'td', function() {
+                    var $row = $(this).closest('tr');
+    
+                    $('.staging-form').removeClass('d-none');
+                    var ingredientId = $row.data('id');
+                    var ingredient = $row.data('ingredient');
+                    var staging = $row.data('staging');
+
+                    $('#ingredientId').val(ingredientId);
+                    $('#ingredient').val(ingredient);
+
+                    if (staging == 'None') {
+                        $('#staging').val('');
+                    } else {
+                        $('#staging').val(staging);
+                    }
+                });
+
+            //========================================================================================================================================
+                $('#stage-form').on('submit', function(event) {
+                    event.preventDefault();
+                    
+                    var formData = $(this).serialize();
+                    $('#loading-indicator').show();
+                
+                    $.ajax({
+                        url: '{% url "update_staging" %}',
+                        type: 'POST',
+                        data: formData,
+                        success: function(response) {
+                            swal({
+                                title: "Success!",
+                                text: "",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    }
+                                }
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000); 
+                            });
+                        },
+                        error: function(xhr, errmsg, err) {
+                            swal({
+                                title: "Error!",
+                                text: '',
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    }
+                                }
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload();
+                                }, 1000); 
+                            });
+                        },
+                    });
+                });
+            //========================================================================================================================================
+
+        });
+    </script>
+
+    <script>
+        $('#sortable-bodys').sortable({
+            items: 'tr:not(.table-info)', // Exclude rows that are not sortable (e.g., headers)
+            update: function(event, ui) {
+                console.log('Sort order updated.');
+        
+                var sortedIDs = [];
+                
+                $(this).find('tr').each(function() {
+                    var id = $(this).data('id');
+                    if (id !== undefined) {
+                        sortedIDs.push(id);
+                    }
+                });
+        
+                console.log('Sorted IDs:', sortedIDs);
+                $('#loading-indicator').show();
+        
+                $.ajax({
+                    url: '{% url "update_sort_order" %}',
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'sorted_ids': sortedIDs
+                    },
+                    success: function(response) {
+                        setTimeout(function() {
+                            $('#loading-indicator').hide();
+                            location.reload();
+                        }, 500); 
+                    },
+                    error: function() {
+                        swal({
+                            title: "Error",
+                            text: "",
+                            icon: "error",
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-danger",
+                                },
+                            },
+                        });
+                    },
+                    complete: function() {
+                        setTimeout(function() {
+                            $('#loading-indicator').hide();
+                        }, 500); 
+                    }
+                });
+            }
+        });        
+    </script>    
+
+    <style>
+        
+        .table-info {
+            background-color: #d9edf7;
+            font-weight: bold;
+        }
+        
+        .table-secondary {
+            background-color: #f7f7f7;
+        }
+
+        .staging-form {
+            border: 1px solid #ccc;
+            background-color: white;
+            padding: 15px;
+            white-space: nowrap;
+        }
+
+        .staging-form input {
+            width: 70%;
+            margin-left: 50px;
+        }
+
+        .staging-form select {
+            width: 70%;
+            margin-left: 50px;
+        }
+
+        .custom-siderbar-1 i {
+            font-size: 24px;
+        }
+        .custom-siderbar-1 span {
+            font-size: 12px;
+        }
+
+        .sub-content-area {
+            background-color: #F8F9FA;
+            height: 10vh;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .select2-container--bootstrap .select2-selection--single {
+            height: 40px; !important;
+        }
+        
+        .select2-container--bootstrap .select2-results__option {
+            padding: 10px !important;
+        }
+        
+        .select2-container--bootstrap .select2-dropdown {
+            padding: 10px !important;
+        }
+        
+        .select2-container--bootstrap .select2-search__field {
+            padding: 8px !important;
+        }
+
+        .main_table {
+            font-size: 12px;
+
+        }
+
+        #main_table tr {
+            transition: all 0.2s ease-in-out;
+        }
+        
+        #main_table thead th {
+            background-color: #F2F2F2;
+            white-space: nowrap;
+        }
+
+        #table-container, #sidebar-container {
+            transition: width 0.2s ease; /* Smooth transition for width changes */
+        }
+        
+    </style>
+{% endblock %}

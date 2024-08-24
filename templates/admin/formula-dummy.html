@@ -1,0 +1,831 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>ALFAM Formulator</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
+
+</head>
+
+    <!-- MESSAGE PROMPT -->
+    {% if messages %}
+        <script>
+            {% for message in messages %}
+                {% if message.tags == 'error' %}
+                    alert('Error: {{ message|escapejs|striptags }}');
+                {% elif message.tags == 'success' %}
+                    alert('Success: {{ message|escapejs|striptags }}');
+                {% elif message.tags == 'warning' %}
+                    alert('Warning: {{ message|escapejs|striptags }}');
+                {% endif %}
+            {% endfor %}
+        </script>
+    {% endif %}
+
+<body>
+
+    <nav class="navbar navbar-light" style="background-color: white;"> 
+        <div class="container-fluid">
+            <div class="sidebar-heading" style="font-weight: bold;">ALFAMFG Formulator</div>
+            <div class="ml-auto d-flex align-items-center" style="margin-right: 5px;">
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-regular fa-bell"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                        <li><a class="dropdown-item" href="#"> Notification 1</a></li>
+                        <li><a class="dropdown-item" href="#">Notification 2</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">View All Notifications</a></li>
+                    </ul>
+                </div>
+                
+                <div style="border-left: 1px solid #ccc; height: 30px; margin: 0 10px;"></div>
+        
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="userInitials" class="rounded-circle" style="height: 40px; width: 40px; line-height: 40px; text-align: center; background-color: #f0f0f0; color: #333; border-radius: 50%; display: inline-block; font-size: 14px; font-weight: bold;">{{ initials }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="font-size: 14px;">
+                        <li><a class="dropdown-item" href="/admin/account_settings"><i class="fas fa-cog me-2"></i> Account Settings</a></li>
+                        <li><a class="dropdown-item hides" href="#"><i class="fa-regular fa-user-circle me-2"></i> Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/signout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Sign Out </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid" id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper" class="sidebar-wrapper col-md-2">
+            <div class="list-group list-group-flush">
+
+                <a href="#" class="list-group-item list-group-item-action" style="background-color: #303030; text-decoration: none; border-bottom: none; color: white;"> 
+                    <i class="fas fa-info-circle"></i> <br>
+                    <span>Formula <br> Info</span>
+                </a>
+
+                <a href="#" class="list-group-item list-group-item-action faded" style="background-color: #303030; text-decoration: none; border-bottom: none; color: white;"> 
+                    <i class="fas fa-solid fa-tint"></i> <br> 
+                    <span> Ingredients </span>
+                </a>
+
+                <a href="#" class="list-group-item list-group-item-action faded" style="background-color: #303030; text-decoration: none; border-bottom: none; color: white;"> 
+                    <i class="fas fa-sticky-note"></i> <br>
+                    <span>Formula <br> Notes</span>
+                </a>
+
+                <a href="#" class="list-group-item list-group-item-action faded" style="background-color: #303030; text-decoration: none; border-bottom: none; color: white;"> 
+                    <i class="fas fa-solid fa-archive"></i> <br>
+                    <span> Archives </span>
+                </a>
+
+                <a href="#" class="list-group-item list-group-item-action faded" style="background-color: #303030; text-decoration: none; border-bottom: none; color: white;"> 
+                    <i class="fas fa-info-circle"></i> <br>
+                    <span> Regulatory <br> Info </span>
+                </a>
+
+                <a href="#" class="list-group-item list-group-item-action faded" style="background-color: #303030; text-decoration: none; border-bottom: none; color: white;"> 
+                    <i class="fas fa-file"></i> <br>
+                    <span>Formula <br> Document</span>
+                </a>
+                
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <div class="col-md-2" style="margin-left: -30px;">
+            <form action="{% url "create_formula" %}" method="POST">
+                {% csrf_token %}
+                
+                <div class="content-area">
+                    <p style="font-size: 14px;">Formula Info</p><br>
+
+                    <div class="mb-3">
+                        <label for="folderSelect" class="form-label" style="color: #959595;">Folder Name *</label><br>
+                        <select class="form-select customSelect" id="folderSelect" name="folderSelect" style="color: #959595; background-color: #363636;">
+                            <option value="default">Select a folder</option>
+                            {% for folder_formula in folder_formulas %}
+                                <option value="{{ folder_formula.id }}">{{ folder_formula.folder_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="brand_name" name="brand_name" placeholder="" style="background-color: #363636; color: #959595; border: none; font-size: 12px;">
+                        <label for="brand_name">Brand Name</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="product_name" name="product_name" placeholder="" style="background-color: #363636; color: #959595; border: none; font-size: 12px;">
+                        <label for="product_name">Product Name *</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="category-select" class="form-label" style="color: #959595;">Category *</label><br>
+                        <select class="form-select customSelect" id="category-select" name="category-select" style="color: #959595; background-color: #363636;">
+                            <option value="default"></option>
+                            {% for category in allcategory %}
+                                <option value="{{ category.id }}">{{ category.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="subcategory-select" class="form-label" style="color: #959595;">Sub Category *</label><br>
+                        <select class="form-select customSelect" id="subcategory-select" name="subcategory-select"  style="color: #959595; background-color: #363636;">
+                    
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="product_type" class="form-label" style="color: #959595;">Product Type *</label>
+                        <select class="form-select customSelect" id="product_type" name="product_type" style="color: #959595; background-color: #363636;">
+                        
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="product_format" class="form-label" style="color: #959595;">Product Format *</label>
+                        <select class="form-select customSelect" id="product_format" name="product_format" style="color: #959595; background-color: #363636;">
+                            <option value="default"></option>
+                            {% for productformat in allproductformat %}
+                                <option value="{{ productformat.id }}">{{ productformat.product_format }} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="formula_owner"  class="form-label" style="color: #959595;">Formula Owner</label>
+                        <select class="form-select customSelect" id="formula_owner" name="formula_owner" style="color: #959595; background-color: #363636;">
+                            <option value="default"></option>
+                            {% for user in users %}
+                                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>Optional</div><br>
+
+                    <div class="mb-3">
+                        <label for="product_qualities" class="form-label" style="color: #959595;">Product Qualities</label>
+                        <select class="form-select custom-Select" multiple  id="product_qualities" name="product_qualities" style="color: #959595; background-color: #363636; font-size: 12px;">
+                            {% for allproductquality in allproductqualities %}
+                                <option value="{{ allproductquality.id }}">{{ allproductquality.product_quality }} </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="formula_num" name="formula_num" placeholder="" style="background-color: #363636; color: #959595; border: none;">
+                        <label for="formula_num">Formula #</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="upc" class="form-label" style="color: #959595;">UPC</label>
+                        <input type="text" class="form-control" id="upc" name="upc" placeholder="12-14 numbers" style="background-color: #363636; color: #959595; border: none;">
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <div class="form-label" style="color: #959595;">SKUs</div>
+                        <a href="#" style="text-decoration: none; color: #959595;">
+                            <div>Add SKU</div>
+                        </a>
+                    </div>
+                    <br>
+
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="sku" name="sku" placeholder="" style="background-color: #363636; color: #959595; border: none;">
+                        <label for="sku">SKU</label>
+                    </div>
+                </div>
+
+                <div class="sub-content-area" style="padding: 20px;">
+                    <div class="d-flex" style="justify-content: space-around;">
+                        <button class="btn" style="font-size: 14px;">Clear All</button>
+                        <button class="btn btn-light" style="color: black; font-size: 14px; padding: 10px;"> Apply</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid ">
+               <div class="white">
+                    <div class="d-flex align-items-center justify-content-between myformulas">
+                        <button class="btn" onclick="history.back()" style="background-color: green">
+                            <i class="fas fa-arrow-left"></i> &nbsp;
+                        </button>  &nbsp;
+                        
+                        <h5 class="my-0" style="font-size: 16px; margin-right: auto; font-weight: bold;">New Formula</h5>
+
+                        <div>
+                            <button class="btn" style="background-color: green; font-size: 14px;">
+                                <i class="fas fa-check-circle" style="opacity: 1.7em; color: #01DB80;"></i>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container white">
+                        <div id="messages-container"></div>
+
+                        <div class="search-bar">
+                            <div class="dropdown custom-dropdown">
+                                <p class="dropdown-toggle" id="folder_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Regulatory <br> Presets
+                                </p>
+                            
+                                <ul class="dropdown-menu" aria-labelledby="folder_dropdown">
+                                    <li>
+                                        <div class="dropdown-item">
+                                            <input type="text" id="folder-search-input" class="form-control" placeholder="Search..." style="width: 100%; font-size: 12px;">
+                                        </div>
+                                    </li>
+                                    <hr>
+                            
+                                </ul>
+                            </div>
+                            
+                            <div class="dropdown custom-dropdown">
+                                <p class="dropdown-toggle" id="category_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Retail <br> Standard
+                                </p>
+                            
+                                <ul class="dropdown-menu" aria-labelledby="category_dropdown">
+                                    <li>
+                                        <div class="dropdown-item">
+                                            <input type="text" id="category-search-input" class="form-control" placeholder="Search..." style="width: 100%; font-size: 12px;">
+                                        </div>
+                                    </li>
+                                    <hr>
+                                    
+                                </ul>
+                            </div>
+                  
+                            <div class="dropdown custom-dropdown">
+                                <p class="dropdown-toggle" id="subcategory_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Geographic <br> Restriction
+                                </p>
+                            
+                                <ul class="dropdown-menu" aria-labelledby="subcategory_dropdown">
+                                    <li>
+                                        <div class="dropdown-item">
+                                            <input type="text" id="subcategory-search-input" class="form-control" placeholder="Search..." style="width: 100%; font-size: 12px;">
+                                        </div>
+                                    </li>
+                                    <hr>
+                    
+                                </ul>
+                            </div>
+                            
+                            <div class="dropdown custom-dropdown">
+                                <p class="dropdown-toggle" id="product_type_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Consumer <br> Standard
+                                </p>
+                            
+                                <ul class="dropdown-menu" aria-labelledby="product_type_dropdown">
+                                    <li>
+                                        <div class="dropdown-item">
+                                            <input type="text" id="product-type-search-input" class="form-control" placeholder="Search..." style="width: 100%; font-size: 12px;">
+                                        </div>
+                                    </li>
+                                    <hr>
+                                    
+                                </ul>
+                            </div>
+                            
+                            <div class="dropdown custom-dropdown">
+                                <p class="dropdown-toggle" id="compliance_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Chemical <br> Group
+                                </p>
+                                <ul class="dropdown-menu" aria-labelledby="compliance_dropdown">
+                                    <li>
+                                        <div class="dropdown-item">
+                                            <input type="text" id="compliance-type-search-input" class="form-control" placeholder="Search..." style="width: 100%; font-size: 12px;">
+                                        </div>
+                                    </li>
+                                    <hr>
+                                   
+                                </ul>
+                            </div>
+
+                            <div class="dropdown custom-dropdown">
+                                <p class="dropdown-toggle" id="product_type_dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Private <br> Policy
+                                </p>
+                            
+                                <ul class="dropdown-menu" aria-labelledby="product_type_dropdown">
+                                    <li>
+                                        <div class="dropdown-item">
+                                            <input type="text" id="product-type-search-input" class="form-control" placeholder="Search..." style="width: 100%; font-size: 12px;">
+                                        </div>
+                                    </li>
+                                    <hr>
+                                    
+                                </ul>
+                            </div>
+                        
+                            <input type="text" placeholder="Search" class="search-input icon-rtl">
+                            <button class="apply-button">Apply</button>
+                            <button class="clear-button">Clear</button>
+                        </div> <br>
+
+                        <table class="table" id="main_table">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    <th scope="col">Item#</th>
+                                    <th scope="col">Ingredient Name</th>
+                                    <th scope="col"></th>
+                                    <th scope="col">Concentration</th>
+                                    <th scope="col">Warning Flags</th>
+                                    <th style="width: 10px; text-align: right;" scope="col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody> </tbody>
+                        </table>
+                    </div>
+                    <br>
+               </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/js/multi-select-tag.js"></script>
+
+    <!-- Bootstrap JS -->
+
+    <!-- Script -->
+    <script>
+        $(document).ready(function() {
+            //=======================================================================================================================================
+
+            $('.customSelect').select2({
+                theme: 'bootstrap',        
+            });
+
+            //========================================================================================================================================
+          
+            $('#category-select').change(function(){
+                var categoryId = $(this).val();
+                $.ajax({
+                    url: '{% url "get_subcategories" %}',
+                    data: {
+                        'category_id': categoryId
+                    },
+                    success: function(data){
+                        var subcategorySelect = $('#subcategory-select');
+                        subcategorySelect.empty();
+                        subcategorySelect.append('<option value="default"></option>');
+                        data.forEach(function(subcategory){
+                            subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.subcategory_name + '</option>');
+                        });
+                    }
+                });
+            });
+
+            //========================================================================================================================================
+           
+            $('#subcategory-select').change(function(){
+                var subcategoryId = $(this).val();
+                $.ajax({
+                    url: '{% url "get_producttypes" %}',
+                    data: {
+                        'subcategory_id': subcategoryId
+                    },
+                    success: function(data){
+                        var producttypeSelect = $('#product_type');
+                        producttypeSelect.empty();
+                        producttypeSelect.append('<option value="default"></option>');
+                        data.forEach(function(producttype){
+                            producttypeSelect.append('<option value="' + producttype.id + '">' + producttype.product_type + '</option>');
+                        });
+                    }
+                });
+            });
+           
+            //========================================================================================================================================
+           
+            new MultiSelectTag('product_qualities', {
+                rounded: false,   
+                shadow: true,  
+                placeholder: 'Search', 
+                tagColor: {
+                    textColor: '#959595',
+                    borderColor: '#363636',
+                },
+            })
+
+            $('.wrapper .body.shadow').css({
+                'background-color': '#363636',
+                'border': 'none',
+            });
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+
+
+         });
+
+    </script>
+
+    <!-- Style -->
+    <style>
+
+        ul li {
+            font-size: 12px;
+            vertical-align: middle;
+            
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            font-size: 12px;
+            vertical-align: middle;
+            height: 65px;
+        }
+        
+        .custom-dropdown {
+            padding: 15px;
+            border-right: 1px solid #ccc;
+            vertical-align: middle;
+            font-size: 12px;
+            height: 65px;
+            text-align: left;
+        }
+
+        .search-input {
+            padding: 5px;
+            margin-left: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            flex-grow: 1;
+            vertical-align: middle;
+
+        }
+        
+        .icon-rtl {
+            padding-right: 25px;
+            background: url("https://static.thenounproject.com/png/101791-200.png") no-repeat right;
+            background-size: 20px;
+          }
+          
+        .apply-button, .clear-button {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+
+        .custom-select {
+            color: #959595; 
+            background-color: #363636;
+            border: 1px solid #363636; 
+        }
+
+        .select2-container .select2-selection--single {
+            height: calc(2.25rem + 2px);
+            padding: .375rem .75rem;
+            color: #959595; 
+            background-color: #363636; 
+            border: 1px solid #363636; 
+        }
+
+        /* Styles for the arrow icon */
+        .select2-container .select2-selection__arrow {
+            top: 5px; 
+        }
+
+        /* Custom styling for Select2 options */
+        .select2-container .select2-results__options {
+            background-color: #363636; 
+            color: #959595;
+            font-size: 12px;
+            border: none;
+
+        }
+
+        /* Style when option is hovered */
+        .select2-container .select2-results__option--highlighted {
+            background-color: #555; 
+            color: #fff; 
+        }
+
+        ::placeholder {
+            color: #959595 !important;
+            font-size: 12px;
+          }
+
+        .select2{
+            color: #959595;
+            background-color: #363636;
+            border: none;
+        }
+
+        .mult-select-tag {
+            color: #959595 !important;
+            background-color: #363636 !important;
+            border: none !important;
+        }
+
+        .form-floating label {
+            background-color: transparent !important;  
+            color: #959595 !important;
+            border: none;
+        }
+        
+        .form-floating select {
+            background-color: transparent !important;  
+            color: #959595 !important;
+            border: none;
+        }
+
+        .form-floating > input + label:after {
+            background-color: transparent !important;  
+            border: none;
+        }
+        
+        .unstyled-button {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .unstyled-buttons {
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+
+        .uniform-size {
+            width: 100%;
+            padding: 10px;
+            font-size: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            display: block;
+        }
+        
+        .uniform-size:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+       
+        .container {
+            margin-top: 3rem;
+        }
+
+        .d-flex {
+            display: flex;
+            align-items: center;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-contents {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 20%;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .modal-contents_formula {
+            background-color: #fff;
+            margin: 15% auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 20%;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-body input {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #wrapper {
+            display: flex;
+            
+        }
+
+        #sidebar-wrapper {
+            width: 100px;  /* Adjusted to fit icon and text */
+            display: flex;
+            flex-direction: column;
+            align-items: flex-center;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 12px;
+            margin-top: 20px;
+            border-bottom: none;
+            font-weight: bold;
+            background-color: #303030;
+            height: 90vh;
+        }
+
+        #sidebar-wrapper a i {
+            font-size: 20px;
+        }
+
+        .content-area {
+            margin-left: 10px;
+            margin-top: 20px;
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 12px;
+            background-color: #303030;
+            color: white;
+            padding: 20px;
+            height: 80vh;
+            max-height: 80vh;
+            overflow-y: auto;
+
+        }
+
+        .sub-content-area {
+            margin-left: 10px;
+            border-bottom: none;
+            font-weight: bold;
+            font-size: 12px;
+            background-color: #303030;
+            color: white;
+            padding: 20px;
+            height: 10vh;
+            position: sticky;
+            bottom: 0;
+        }
+
+
+        #page-content-wrapper {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .myformulas {
+            background-color: green;
+            padding: 8px;
+            color: white;
+        }
+
+        html, body {
+            background-color: #e3f2fd;
+            font-family: Arial;
+            height: 100%;
+            margin: 0;
+        }
+
+        .btn {
+            font-size: 12px;
+            color: white;
+            font-weight: bold;
+
+        }
+
+        .table-container {
+            font-size: 12px;
+            margin: 15px;
+        }
+
+        .white {
+            background-color: white;
+
+        }
+
+        #myTabs {
+            margin: 0;
+            padding: 0;
+            border: 1px solid #dee2e6;
+        }
+
+        .hides {
+            display: none;
+        }
+
+        .center-align {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .left-align {
+            text-align: left;
+            vertical-align: middle;
+        }
+
+        #main_table {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-collapse: collapse;
+        }
+
+        #main_table th:last-child {
+            background-color: white;
+        }
+ 
+        #main_table th {
+            background-color: #F2F2F2;
+            padding: 10px;
+        }
+
+        .faded {
+            opacity: 0.5;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
+        }
+  
+    </style>
+</body>
+</html>

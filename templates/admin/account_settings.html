@@ -1,0 +1,490 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>ALFAM Formulator</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.css" />
+
+</head>
+<body>
+
+    <nav class="navbar navbar-light" style="background-color: white;"> 
+        <div class="container-fluid">
+            <div class="sidebar-heading" style="font-weight: bold;"><a href="/admin/dashboard">ALFAMFG Formulator</a></div>
+            <div class="ml-auto d-flex align-items-center" style="margin-right: 5px;">
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" id="notificationsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-regular fa-bell"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                        <li><a class="dropdown-item" href="#"> Notification 1</a></li>
+                        <li><a class="dropdown-item" href="#">Notification 2</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">View All Notifications</a></li>
+                    </ul>
+                </div>
+                
+                <div style="border-left: 1px solid #ccc; height: 30px; margin: 0 10px;"></div>
+        
+                <div class="dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span id="userInitials" class="rounded-circle" style="height: 40px; width: 40px; line-height: 40px; text-align: center; background-color: #f0f0f0; color: #333; border-radius: 50%; display: inline-block; font-size: 14px; font-weight: bold;">{{ initials }}</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown" style="font-size: 14px;">
+                        <li><a class="dropdown-item" href="/admin/account_settings"><i class="fas fa-cog me-2"></i> Account Settings</a></li>
+                        <li><a class="dropdown-item hides" href="#"><i class="fa-regular fa-user-circle me-2"></i> Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/signout"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Sign Out </a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <div id="sidebar-wrapper">
+            <div class="d-flex align-items-center white" style="padding: 20px;">
+                <span id="userInitials" class="rounded-circle me-2" style="height: 80px; width: 80px; line-height: 80px; text-align: center; background-color: #f0f0f0; color: #333; border-radius: 50%; display: inline-block; font-size: 18px; font-weight: bold;">{{ initials }}</span>
+                <div style="vertical-align: middle;">
+                    <p style="font-size: 16px; margin-top: 10px;">
+                        {{ user_firstname }} {{ user_lastname }} <br>
+                        <span style="color: #AEAEAE;"> {{ user_email }}</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- /#sidebar-wrapper -->
+
+        <!-- Page Content -->
+        <div id="page-content-wrapper">
+            <div class="container-fluid ">
+               <div class="white">
+
+                    <div class="d-flex align-items-center justify-content-between account_settings">
+                        <button class="btn" onclick="history.back()" style="background-color: green">
+                            <i class="fas fa-arrow-left"></i> &nbsp;
+                        </button>  &nbsp;
+
+                        <h5 class="my-0" style="font-size: 16px; font-weight: bold; margin-right: auto;">Account Settings</h5>
+                     
+                    </div>
+                    
+                    <div class="table-container white">
+                    
+                    </div>
+                    <br>
+               </div>
+            </div>
+        </div>
+        <!-- /#page-content-wrapper -->
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- ADD User MODAL -->
+    <div id="addUserModal" class="modal">
+        <div class="modal-contents">
+          <span class="close">&times;</span>
+          <p style="font-weight: bold; font-size: 16px;">Add User</p> 
+          <hr>
+          <div class="modal-body">
+                <form action="{% url "add_user" %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-container">
+
+                        <div class="input-group">
+                            <span class="input-group-text">First Name</span>
+                            <input type="text" name="first_name" class="form-control uniform-size" required>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Last Name </span>
+                            <input type="text" name="last_name" class="form-control uniform-size" required>
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Username</span>
+                            <input type="text" name="username" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" name="email" class="form-control uniform-size" required>
+                        </div>
+
+                        <input type="text" value="alfam123" name="password" class="form-control uniform-size" hidden>
+                        <hr>
+                        <button class="btn btn-primary" id="createFolderBtn" type="submit">Apply</button>
+                    </div>
+                </form>
+          </div>
+        </div>
+    </div>
+
+    <!-- Edit User MODAL -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-contents">
+            <span class="close">&times;</span>
+            <p style="font-weight: bold; font-size: 16px;">Edit User</p> 
+            <hr>
+            <div class="modal-body">
+                <form action="{% url "update_user" %}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-container">
+
+                        <input type="text" id="user_id" name="user_id" class="form-control uniform-size" hidden>
+
+                        <div class="input-group">
+                            <span class="input-group-text">First Name</span>
+                            <input type="text" id="first_name" name="first_name" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Last Name </span>
+                            <input type="text" id="last_name" name="last_name" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Username</span>
+                            <input type="text" id="username" name="username" class="form-control uniform-size">
+                        </div>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" id="email" name="email" class="form-control uniform-size">
+                        </div>
+                        <hr>
+                        <div class="input-group">
+                            <span class="input-group-text">Status</span>
+                            <select id="status" name="status" class="form-select uniform-size" style="padding: 10px;">
+                                <option value="Approved">Approved</option>
+                                <option value="Not Approved">Not Approved</option>
+                            </select>
+                        </div>
+
+                        <input type="text" id="password" value="alfam123" name="password" class="form-control uniform-size" hidden>
+                        <hr>
+
+                        <button class="btn btn-primary" id="createFolderBtn" type="submit">Apply</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+  <!-- MESSAGE PROMPT -->
+  {% if messages %}
+    <script>
+      {% for message in messages %}
+        {% if message.tags == 'error' %}
+            alert('Error: {{ message|escapejs|striptags }}');
+        {% elif message.tags == 'success' %}
+            alert('Success: {{ message|escapejs|striptags }}');
+        {% elif message.tags == 'warning' %}
+            alert('Warning: {{ message|escapejs|striptags }}');
+        {% endif %}
+      {% endfor %}
+    </script>
+  {% endif %}
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <!-- Bootstrap JS -->
+
+    <!-- Script -->
+    <script>
+        $(document).ready(function() {
+    
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+            //========================================================================================================================================
+
+
+         });
+
+    </script>
+
+    <!-- Style -->
+    <style>
+        a {
+            text-decoration: none;
+            color: black;
+        }
+        
+        .unstyled-button {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            margin: 0 5px; 
+        }
+
+        .form-select {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .uniform-size {
+            width: 100%;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 11px;
+
+        }
+        
+        .uniform-size:focus {
+            border-color: #80bdff;
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+        }
+        
+        .input-group {
+            display: flex;
+            align-items: center;
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 11px;
+        }
+        
+        .input-group-text {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px 0 0 4px;
+            padding: 10px;
+            font-size: 11px;
+            width: 75px;
+        }
+        
+        .form-control {
+            flex: 1; /* Takes remaining space */
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ced4da;
+            border-radius: 0 4px 4px 0;
+            box-sizing: border-box;
+            font-size: 11px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-contents {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 10px;
+            border: 1px solid #888;
+            width: 20%;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-body input {
+            width: calc(100% - 40px);
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #wrapper {
+            display: flex;
+        }
+
+        #sidebar-wrapper {
+            width: 350px;
+            height: 10px;
+            font-size: 12px;
+            margin-left: 30px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        #page-content-wrapper {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .account_settings {
+            background-color: green;
+            padding: 8px;
+            color: white;
+        }
+
+        body {
+            background-color: #e3f2fd;
+            font-family: Arial;
+        }
+
+        .white {
+            background-color: white;
+        }
+
+        .btn {
+            font-size: 11px;
+            color: white;
+        }
+
+        .table-container {
+            font-size: 12px;
+            margin: 12px;
+
+        }
+
+        #myTabs {
+            margin: 0;
+            padding: 0;
+            border: 1px solid #dee2e6;
+            font-size: 12px;
+
+        }
+
+        .hides {
+            display: none;
+        }
+
+        .center-align {
+            text-align: center;
+            height: 100%;
+            vertical-align: middle;
+        }
+
+        .left-align {
+            text-align: left;
+        }
+
+        #main_table {
+            width: 100%;
+            border: 1px solid #dee2e6;
+            border-collapse: collapse;
+
+        }
+
+        #main_table th {
+            background-color: #F2F2F2;
+        }
+
+        #main_table td {
+            vertical-align: middle;
+        }
+
+        #main_table th:not(:first-child):not(:last-child),
+        #main_table td:not(:first-child):not(:last-child) {
+            width: 20%; 
+        }
+        
+        #main_table th:first-child,
+        #main_table td:first-child,
+        #main_table th:last-child,
+        #main_table td:last-child {
+            width: 6%;
+        }
+
+        #main_table td:first-child,
+        #main_table td:last-child {
+            padding: 15px;
+        }
+
+
+        .faded {
+            opacity: 0.5;
+        }
+
+        .tab {
+            overflow: hidden;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tab button {
+            background-color: inherit;
+            float: left;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            transition: 0.3s;
+            font-size: 17px;
+        }
+
+        .tab button:hover {
+            background-color: #ddd;
+        }
+
+        .tab button.active {
+            background-color: #ccc;
+        }
+
+        .tabcontent {
+            display: none;
+            padding: 6px 12px;
+            border-top: none;
+        }
+
+        .button-cell {
+            text-align: center; 
+            vertical-align: middle; 
+            height: 100%; 
+        }
+        
+        .button-container {
+            display: inline-block; 
+            vertical-align: middle;
+        }
+
+      .inci {
+            word-wrap: break-word; 
+            white-space: normal; 
+            margin: 0;
+            padding: 0;
+            line-height: 2em;
+        }
+
+        .large-dot {
+            font-size: 24px;
+            vertical-align: middle;
+        }
+
+    </style>
+</body>
+</html>

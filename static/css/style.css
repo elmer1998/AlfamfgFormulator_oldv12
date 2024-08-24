@@ -1,0 +1,310 @@
+a {
+    text-decoration: none;
+    color: black;
+}
+
+.mult-select-tag {
+    border: none !important;
+}
+
+ul li {
+    font-size: 12px;
+    vertical-align: middle;
+
+}
+
+.search-bar {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-size: 12px;
+    vertical-align: middle;
+    height: 50px;
+}
+
+.custom-dropdown {
+    padding: 15px;
+    border-right: 1px solid #ccc;
+    vertical-align: middle;
+    font-size: 12px;
+    height: 50px;
+    text-align: center;
+}
+
+.search-input {
+    padding: 5px;
+    margin-left: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    flex-grow: 1;
+}
+
+.icon-rtl {
+    padding-right: 25px;
+    background: url("https://static.thenounproject.com/png/101791-200.png") no-repeat right;
+    background-size: 20px;
+  }
+  
+.apply-button, .clear-button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.apply-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.clear-button {
+    background-color: #f0f0f0;
+}
+
+.unstyled-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.unstyled-buttons {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+.uniform-size {
+    width: 100%;
+    padding: 10px;
+    font-size: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    box-sizing: border-box;
+    display: block;
+}
+
+.uniform-size:focus {
+    border-color: #80bdff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+.form-container {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.form-container .uniform-size {
+    width: calc(100% - 25px);
+}
+
+.container {
+    margin-top: 3rem;
+}
+
+.d-flex {
+    display: flex;
+    align-items: center;
+}
+
+.label-container {
+    margin-right: 10px;
+}
+
+#addFolderBtn {
+    color: white;
+    border: none;
+}
+
+#addFolderBtn:hover {
+    background-color: #0056b3;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-contents {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 10px;
+    border: 1px solid #888;
+    width: 20%;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 10px;
+}
+
+.modal-contents_formula {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 10px;
+    border: 1px solid #888;
+    width: 20%;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 10px;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    margin-left: auto;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal-body input {
+    width: calc(100% - 40px);
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#createFolderBtn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+#createFolderBtn:hover {
+    background-color: #0056b3;
+}
+
+#wrapper {
+    display: flex;
+}
+
+#sidebar-wrapper {
+    width: 250px;
+    height: 10px;
+    font-size: 12px;
+    margin-left: 10px;
+    margin-top: 20px;
+    font-weight: bold;
+}
+
+#page-content-wrapper {
+    flex: 1;
+    padding: 20px;
+}
+
+.custom-header {
+    background-color: darkgreen;
+    padding: 8px;
+    color: white;
+}
+
+body {
+    background-color: #e3f2fd;
+    font-family: Arial;
+}
+
+.white {
+    background-color: white;
+}
+
+.btn {
+    font-size: 12px;
+    color: white;
+    font-weight: bold;
+
+}
+
+.table-container {
+    font-size: 12px;
+    margin: 15px;
+}
+
+#myTabs {
+    margin: 0;
+    padding: 0;
+    border: 1px solid #dee2e6;
+}
+
+.hides {
+    display: none;
+}
+
+.center-align {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.left-align {
+    text-align: left;
+    vertical-align: middle;
+}
+
+#main_table {
+    width: 100%;
+    border: 1px solid #dee2e6;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#main_table th:first-child,
+#main_table th:last-child  {
+    width: 50px;
+}
+
+#main_table th {
+    background-color: #F2F2F2;
+}
+
+.faded {
+    opacity: 0.5;
+}
+
+.tab {
+    overflow: hidden;
+    border-bottom: 1px solid #ccc;
+}
+
+.tab button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    transition: 0.3s;
+    font-size: 17px;
+}
+
+.tab button:hover {
+    background-color: #ddd;
+}
+
+.tab button.active {
+    background-color: #ccc;
+}
+
+.tabcontent {
+    display: none;
+    padding: 6px 12px;
+    border-top: none;
+}

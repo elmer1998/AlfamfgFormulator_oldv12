@@ -1,0 +1,561 @@
+{% extends "admin.html" %}
+{% load static %}
+
+{% block title %}{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="page-inner">
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card card-round">
+                        
+                        <div class="card-header">
+                            <div class="card-head-row card-tools-still-right">
+                                <a href="/admin/formula">
+                                    <button class="btn">
+                                        <i class="fas fa-arrow-left"></i> &nbsp;
+                                    </button>  &nbsp;
+                                </a>
+                                
+                                <p class="card-title ms-3" style="color: black; font-size: 16px;">{{ formula.brand_name }} - {{ formula.formula_name }}</p>
+                                
+                                <div class="card-tools">
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs d-none" >
+                                        <span class="fa fa-angle-down"></span>
+                                    </button>
+
+                                    <button class="btn btn-icon btn-link btn-primary btn-xs btn-refresh-card d-none">
+                                        <span class="fa fa-sync-alt"></span>
+                                    </button>
+
+                                    <a href="#" class="d-none">
+                                        <button class="btn" style="background-color: lightgreen; opacity: 0.6em; color: black;">Save Changes</button>
+                                    </a>
+
+                                </div>
+                            </div>
+
+                            <p class="card-category d-none">
+                                Map of the distribution of users around the world
+                            </p>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4 d-flex" id="sidebar-container">
+
+                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-1" style="width: 6.5rem;">
+                                        <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                                            <li class="nav-item">
+                                                <a href="/admin/edit_formula/{{ formula.id }}" class="nav-link py-3 border-bottom" aria-current="page" title="Formula" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-info-circle"></i>
+                                                    <br>
+                                                    <span>Formula</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="/admin/formula/{{ formula.id }}/ingredient" class="nav-link py-3 border-bottom" aria-current="page" title="Ingredients" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-solid fa-tint"></i>                                              
+                                                    <br>
+                                                    <span>Ingredients</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Notes" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-sticky-note"></i>
+                                                    <br>
+                                                    <span>Formula <br> Notes</span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Archives" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-solid fa-archive"></i>
+                                                    <br>
+                                                    <span>Archives</span>
+                                                </a>
+                                            </li>
+
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Regulatory Info" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-file"></i> 
+                                                    <br>
+                                                    <span>Regulatory <br> Info </span>
+                                                </a>
+                                            </li>
+
+                                            <li class="nav-item" style="opacity: 0.5;">
+                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Document" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                    <i class="fas fa-address-book"></i>
+                                                    <br>
+                                                    <span>Formula <br> Document </span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-2" id="custom-siderbar-2" style="width: 28em;">
+                                        
+                                        <div class="ms-3 pt-2" style="max-height: 720px; height: 720px; overflow-y: auto;">
+                                            <form id="update_formula">
+                                                {% csrf_token %}
+
+                                                <input type="text" class="form-control" id="formula_id" name="formula_id" value="{{ formula.id }}" hidden>
+
+                                                <div class="form-group">
+                                                    <label for="formula_num">Formula #</label>
+                                                    <input type="text" class="form-control" id="formula_num" name="formula_num" value="{{ formula.formula_num }}">
+                                                </div>
+                                                
+                                                <hr>
+
+                                                <div class="form-group">
+                                                    <label for="folderSelect" class="form-label">Folder Name *</label><br>
+                                                    <select class="form-select customSelect" id="folderSelect" name="folderSelect">
+                                                        {% for folder_formula in folder_formulas %}
+                                                            <option value="{{ folder_formula.id }}"
+                                                                {% if folder_formula.id == selected_folder_id %}selected{% endif %}>
+                                                                {{ folder_formula.folder_name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label for="brand_name">Brand Name</label>
+                                                    <input type="text" class="form-control" id="brand_name" name="brand_name" value="{{ formula.brand_name }}">
+                                                </div>
+                            
+                                                <div class="form-group">
+                                                    <label for="product_name">Product Name *</label>
+                                                    <input type="text" class="form-control" id="product_name" name="product_name" value="{{ formula.formula_name }}">
+                                                </div>
+                            
+                                                <div class="form-group">
+                                                    <label for="category-select" class="form-label">Category *</label><br>
+                                                    <select class="form-select customSelect" id="category-select" name="category-select">
+                                                        <option value="default"></option>
+                                                        {% for category in allcategory %}
+                                                            <option value="{{ category.id }}" {% if category.id == selected_category_id %}selected{% endif %}>
+                                                                {{ category.category_name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                            
+                                                <div class="form-group">
+                                                    <label for="subcategory-select" class="form-label">Sub Category *</label><br>
+                                                    <select class="form-select customSelect" id="subcategory-select" name="subcategory-select">
+                                                        <option value="{{ formula_subcategory.subcategory_id }}">
+                                                            {{ formula_subcategory.subcategory_name }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                            
+                                                <div class="form-group">
+                                                    <label for="product_type" class="form-label">Product Type *</label>
+                                                    <select class="form-select customSelect" id="product_type" name="product_type">
+                                                        <option value="{{ formula.product_type_id }}">
+                                                            {{ formula_product_type.product_type }}
+                                                        </option>
+                                                    </select>
+                                                </div>
+                            
+                                                <div class="form-group">
+                                                    <label for="product_format" class="form-label">Product Format *</label>
+                                                    <select class="form-select customSelect" id="product_format" name="product_format">
+                                                        {% for productformat in allproductformat %}
+                                                            <option value="{{ productformat.id }}" {% if productformat.id == selected_product_format_id %}selected{% endif %}>
+                                                                {{ productformat.product_format }} 
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                            
+                                                <div class="form-group">
+                                                    <label for="formula_owner"  class="form-label">Formula Owner</label>
+                                                    <select class="form-select customSelect" id="formula_owner" name="formula_owner">
+                                                        <option value="default"></option>
+                                                        {% for user in users %}
+                                                            <option value="{{ user.id }}" {% if user.id == formula_owner.id %}selected{% endif %}>
+                                                                {{ user.first_name }} {{ user.last_name }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                                
+                                                <div class="form-group">
+                                                    <label for="product_qualities" class="form-label">Product Qualities</label>
+                                                    <select class="form-select customSelect" multiple id="product_qualities" name="product_qualities" style="color: black;">
+                                                        {% for allproductquality in allproductqualities %}
+                                                            <option value="{{ allproductquality.id }}" 
+                                                                {% if allproductquality in product_qualities %}
+                                                                    selected
+                                                                {% endif %}>
+                                                                {{ allproductquality.product_quality }}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>                                                
+                                                <br>
+                                                <div class="sub-content-area" style="padding: 35px; 10px; border-top: 1px solid #ccc;">
+                                                    <div class="d-flex justify-content-around">
+                                                        <button class="btn btn-refresh-card" type="button">Refresh</button>
+                                                        <button class="btn" type="button" id="clear-all-btn">Clear All</button>
+
+                                                        <button class="btn" type="submit"> Apply</button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Toggle Button -->
+                                    <div class="sidebar-toggle-icon d-flex flex-column flex-shrink-0 justify-content-center align-items-center bg-light" style="width: 2.5em; padding: 10px;">
+                                        <i id="toggle-sidebar" class="icon-arrow-left" style="font-size: 12px; cursor: pointer; border: 1px solid #ccc; padding: 30px 10px; border-radius: 50px;"></i>
+                                    </div>
+
+                                </div>
+                    
+                                <div class="col-md-8" id="table-container">
+                                    <div class="table-responsive table-hover">
+                                        <!-- Table content here -->
+                                        <table class="table display table-hover" id="main_table" role="grid">
+                                            <thead>
+                                                <tr>
+                                                    <th class="center-align" scope="col">Item#</th>
+                                                    <th scope="col">Ingredient Name</th>
+                                                    <th scope="col"></th>
+                                                    <th scope="col">Concentration</th>
+                                                    <th scope="col">Warning Flags</th>
+                                                    <th style="width: 10px; text-align: right;" scope="col">Actions</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="sortable-body">
+                                                {% for stage, ingredients in ingredients_by_stage.items %}
+                                                    <tr class="table-info">
+                                                        <th colspan="6" class="text-uppercase"><strong>Stage: &nbsp; &nbsp; &nbsp; {{ stage.description }}</strong></th>
+                                                    </tr>
+                                                    {% for ingredient in ingredients %}
+                                                        <tr data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
+                                                            <td class="center-align" scope="col">{{ ingredient.sortOrder }}</td>
+                                                            <td scope="col">{{ ingredient.ingredient_name }}</td>
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>    
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                        
+                                                <!-- Display ingredients with no stage first -->
+                                                {% if no_stage_ingredients %}
+                                                    <tr class="table-info">
+                                                        <th colspan="6" class="text-uppercase"><strong>No Stage</strong></th>
+                                                    </tr>
+                                                    {% for ingredient in no_stage_ingredients %}
+                                                        <tr data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
+                                                            <td class="center-align" scope="col">{{ ingredient.sortOrder }}</td>
+                                                            <td scope="col">{{ ingredient.ingredient_name }}</td>
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>    
+                                                            <td scope="col"></td>
+                                                            <td scope="col"></td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </tbody>
+                                        </table>    
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+        //=======================================================================================================================================
+
+            var $anchor = $('li.formula');
+            $anchor.addClass('active');
+
+        //=======================================================================================================================================
+
+            $('.customSelect').select2({
+                theme: 'bootstrap',   
+                width: 'resolve',
+            });
+            
+        //========================================================================================================================================
+          
+            $('#category-select').change(function(){
+                var categoryId = $(this).val();
+                $.ajax({
+                    url: '{% url "get_subcategories" %}',
+                    data: {
+                        'category_id': categoryId
+                    },
+                    success: function(data){
+                        var subcategorySelect = $('#subcategory-select');
+                        subcategorySelect.empty();
+                        subcategorySelect.append('<option value="default"></option>');
+                        data.forEach(function(subcategory){
+                            subcategorySelect.append('<option value="' + subcategory.id + '">' + subcategory.subcategory_name + '</option>');
+                        });
+                    }
+                });
+            });
+
+        //========================================================================================================================================
+           
+            $('#subcategory-select').change(function(){
+                var subcategoryId = $(this).val();
+                $.ajax({
+                    url: '{% url "get_producttypes" %}',
+                    data: {
+                        'subcategory_id': subcategoryId
+                    },
+                    success: function(data){
+                        var producttypeSelect = $('#product_type');
+                        producttypeSelect.empty();
+                        producttypeSelect.append('<option value="default"></option>');
+                        data.forEach(function(producttype){
+                            producttypeSelect.append('<option value="' + producttype.id + '">' + producttype.product_type + '</option>');
+                        });
+                    }
+                });
+            });
+           
+        //========================================================================================================================================
+            
+            $('#update_formula').on('submit', function(event) {
+                    event.preventDefault(); // Prevent the default form submission
+                    
+                    var formData = $(this).serialize();
+                    $('#loading-indicator').show();
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/admin/update_formula', 
+                        data: formData,
+                        success: function(response) {
+                            swal("Success!", " Formula succesfully updated", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "An error occurred while trying to update the formula.",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        }
+                    });
+                });
+            
+        //========================================================================================================================================
+         
+            $('#clear-all-btn').on('click', function() {
+                // Clear all input fields
+                $('#update_formula').find('input[type="text"]').val('');
+                
+                // Clear all select fields
+                $('#update_formula').find('select').prop('selectedIndex', 0);
+                
+                // Clear multi-select fields
+                $('#product_qualities').val([]).change();
+            });
+            
+        //=======================================================================================================================================
+            
+            $('#toggle-sidebar').click(function() {
+                if ($('#custom-siderbar-2').is(':visible')) {
+
+                    $('#custom-siderbar-2').animate({ width: 'toggle' }, 300, function() {
+                        $(this).addClass('d-none');
+                        $('#table-container').removeClass('col-md-8').addClass('col-md-11');
+                        $('#sidebar-container').removeClass('col-md-4').addClass('col-md-1'); 
+                        
+                    });
+
+                    $(this).removeClass('icon-arrow-left').addClass('icon-arrow-right');
+
+                } else {
+                    $('#custom-siderbar-2').removeClass('d-none').animate({ width: 'toggle' }, 50, function() {
+                        $('#table-container').removeClass('col-md-11').addClass('col-md-8');
+                        $('#sidebar-container').removeClass('col-md-1').addClass('col-md-4');
+                    });
+
+                    $(this).removeClass('icon-arrow-right').addClass('icon-arrow-left');
+
+                }
+
+            });
+              
+        //========================================================================================================================================
+            $('#main_table tbody').on('click', 'td', function() {
+                var $row = $(this).closest('tr');
+
+                $('.staging-form').removeClass('d-none');
+                var ingredientId = $row.data('id');
+                var ingredient = $row.data('ingredient');
+                var staging = $row.data('staging');
+
+                $('#ingredientId').val(ingredientId);
+                $('#ingredient').val(ingredient);
+
+                if (staging == 'None') {
+                    $('#staging').val('');
+                } else {
+                    $('#staging').val(staging);
+                }
+            });
+        //========================================================================================================================================
+
+         });
+    </script>
+
+    <script>
+        $('#sortable-body').sortable({
+            start: function(event, ui) {
+                console.log('Drag started:', ui.item.index());
+            },
+            sort: function(event, ui) {
+                console.log('Sorting in progress. Current position:', ui.position);
+            },
+            change: function(event, ui) {
+                console.log('Item changed position:', ui.item.index());
+            },
+            stop: function(event, ui) {
+                console.log('Drag stopped. Final position:', ui.item.index());
+            },
+            update: function(event, ui) {
+                console.log('Sort order updated.');
+                
+                var sortedIDs = [];
+                $(this).find('tr').each(function() {
+                    var id = $(this).data('id');
+                    if (id !== undefined) {
+                        sortedIDs.push(id);
+                    }
+                });
+        
+                console.log('Sorted IDs:', sortedIDs);
+                $('#loading-indicator').show();
+
+                $.ajax({
+                    url: '{% url "update_sort_order" %}',
+                    type: 'POST',
+                    data: {
+                        'csrfmiddlewaretoken': '{{ csrf_token }}',
+                        'sorted_ids': sortedIDs
+                    },
+                    success: function(response) {
+                        setTimeout(function() {
+                            $('#loading-indicator').hide();
+                            location.reload();
+                        }, 500); 
+                    },
+                    error: function() {
+                        swal({
+                            title: "Error",
+                            text: "",
+                            icon: "error",
+                            buttons: {
+                                confirm: {
+                                    className: "btn btn-danger",
+                                },
+                            },
+                        });
+                    },
+                    complete: function() {
+                        setTimeout(function() {
+                            $('#loading-indicator').hide();
+                        }, 500); 
+                    }
+                });
+            }
+        });
+    </script>
+
+    <style>
+        
+        .custom-siderbar-1 i {
+            font-size: 24px;
+        }
+        .custom-siderbar-1 span {
+            font-size: 12px;
+        }
+
+        .sub-content-area {
+            background-color: #F8F9FA;
+            height: 10vh;
+            position: sticky;
+            bottom: 0;
+        }
+
+        .select2-container--bootstrap .select2-selection--single {
+            height: 40px; !important;
+        }
+        
+        .select2-container--bootstrap .select2-results__option {
+            padding: 10px !important;
+        }
+        
+        .select2-container--bootstrap .select2-dropdown {
+            padding: 10px !important;
+        }
+        
+        .select2-container--bootstrap .select2-search__field {
+            padding: 8px !important;
+        }
+        
+        #main_table thead th {
+            background-color: #F2F2F2;
+            white-space: nowrap;
+
+        }
+
+        #table-container, #sidebar-container {
+            transition: width 0.2s ease; /* Smooth transition for width changes */
+        }
+
+    </style>
+{% endblock %}
