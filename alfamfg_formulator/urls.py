@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin_helpers/', include('admin_helpers.urls')),
     path('vendor/', include('vendor.urls')),
     path('parts/', include('part.urls')),
+    path('reports/', include('reports.urls')),
 
 ]

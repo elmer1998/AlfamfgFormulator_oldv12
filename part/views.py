@@ -4,24 +4,39 @@ from django.shortcuts import get_object_or_404, redirect, render
 from admin_helpers.models import Ingredients
 from admin_panel.views import get_user_initials
 from part.models import PartDocument, Parts
-from vendor.models import Vendor
+from vendor.models import Vendor, VendorParts
 from django.core.files.storage import default_storage
+from django.db.models import OuterRef, Subquery, Max, Prefetch
 
 # Create your views here.
 
 # ============================================================================================================================================================================================================
 
 def parts_inventory(request):
-    
     user = request.user
     initials = get_user_initials(user)
 
-    parts_inventories = Parts.objects.all()
-    
+    latest_updated_at = VendorParts.objects.filter(
+        part=OuterRef('part'),
+        defaultFlag=True
+    ).values('part').annotate(
+        latest_updated_at=Max('updated_at')
+    ).values('latest_updated_at')
+
+    vendor_parts_prefetch = Prefetch(
+        'vendorparts_set',
+        queryset=VendorParts.objects.filter(
+            defaultFlag=True,
+            updated_at=Subquery(latest_updated_at)
+        ),
+        to_attr='default_vendor_parts'
+    )
+
+    parts_inventories = Parts.objects.prefetch_related(vendor_parts_prefetch).all()
+
     return render(request, "admin/parts_inventory.html", {
         'initials': initials,
         'parts_inventories': parts_inventories,
-
     })
     
 # ============================================================================================================================================================================================================

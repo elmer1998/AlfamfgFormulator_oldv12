@@ -133,33 +133,6 @@
                                                     </div>
                                                 </form>
 
-                                                <div class="staging-form d-none">
-                                                    <form id="stage-form">
-                                                        {% csrf_token %}
-                                                        <div class="row mb-3">
-                                                            <label for="ingredient" class="col-sm-2 col-form-label">Ingredient</label>
-                                                            <div class="col-sm-10">
-                                                                <input type="text" name="ingredient_id" class="form-control" id="ingredientId" hidden>
-                                                                <input type="text" class="form-control" id="ingredient" disabled>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row mb-3">
-                                                            <label for="stage" class="col-sm-2 col-form-label">Stage</label>
-                                                            <div class="col-sm-10">
-                                                                <select id="staging" name="staging_id" class="form-select text-uppercase">
-                                                                    {% if staging %}
-                                                                        {% for stage in staging %}
-                                                                            <option value="{{ stage.id }}" {% if stage.id|stringformat:"i" == staging_id|stringformat:"i" %}selected{% endif %}>{{ stage.name }}</option>
-                                                                        {% endfor %}
-                                                                    {% endif %}
-                                                                </select>                                                                                                                          
-                                                            </div>
-                                                        </div>
-
-                                                        <button type="submit" class="btn btn-info mt-2">Apply</button>
-                                                    </form>
-                                                </div>
                                             </div>
 
                                             <div class="tab-pane fade" id="pills-existing" role="tabpanel" aria-labelledby="pills-existing-tab">
@@ -190,11 +163,11 @@
                                             </thead>
                                             <tbody id="sortable-body">
                                                 {% for stage, ingredients in ingredients_by_stage.items %}
-                                                    <tr class="table-info">
-                                                        <th colspan="6" class="text-uppercase"><strong>Stage: &nbsp; &nbsp; &nbsp; {{ stage.description }}</strong></th>
+                                                    <tr class="table-info" data-staging-id="{{ stage.id }}" data-staging-name="{{ stage.name }}">
+                                                        <th colspan="6" class="text-uppercase"><strong> {{ stage.name }}</strong></th>
                                                     </tr>
                                                     {% for ingredient in ingredients %}
-                                                        <tr data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
+                                                        <tr data-bs-toggle="modal" data-bs-target="#assign-staging-modal" data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
                                                             <td class="center-align" scope="col">{{ ingredient.sortOrder }}</td>
                                                             <td scope="col">{{ ingredient.ingredient_name }}</td>
                                                             <td scope="col"></td>
@@ -204,23 +177,7 @@
                                                         </tr>
                                                     {% endfor %}
                                                 {% endfor %}
-                                        
-                                                <!-- Display ingredients with no stage first -->
-                                                {% if no_stage_ingredients %}
-                                                    <tr class="table-info">
-                                                        <th colspan="6" class="text-uppercase"><strong>No Stage</strong></th>
-                                                    </tr>
-                                                    {% for ingredient in no_stage_ingredients %}
-                                                        <tr data-id="{{ ingredient.id }}" data-ingredient="{{ ingredient.ingredient_name }}" data-staging="{{ ingredient.staging_id }}">
-                                                            <td class="center-align" scope="col">{{ ingredient.sortOrder }}</td>
-                                                            <td scope="col">{{ ingredient.ingredient_name }}</td>
-                                                            <td scope="col"></td>
-                                                            <td scope="col"></td>    
-                                                            <td scope="col"></td>
-                                                            <td scope="col"></td>
-                                                        </tr>
-                                                    {% endfor %}
-                                                {% endif %}
+                                    
                                             </tbody>
                                         </table>                                                                         
                                         
@@ -234,6 +191,41 @@
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Staging -->
+    <div class="modal fade" id="assign-staging-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="staging-form">
+                    <form id="stage-form">
+                        {% csrf_token %}
+                        <div class="row mb-3">
+                            <label for="ingredient" class="col-sm-2 col-form-label">Ingredient</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="ingredient_id" class="form-control" id="ingredientId" hidden>
+                                <input type="text" class="form-control" id="ingredient" disabled>
+                            </div>
+                        </div>
+    
+                        <div class="row mb-3">
+                            <label for="stage" class="col-sm-2 col-form-label">Stage</label>
+                            <div class="col-sm-10">
+                                <select id="staging" name="staging_id" class="form-select text-uppercase">
+                                    {% if staging %}
+                                        {% for stage in staging %}
+                                            <option value="{{ stage.id }}" {% if stage.id|stringformat:"i" == staging_id|stringformat:"i" %}selected{% endif %}>{{ stage.name }}</option>
+                                        {% endfor %}
+                                    {% endif %}
+                                </select>                                                                                                                          
+                            </div>
+                        </div>
+    
+                        <button type="submit" class="btn btn-info mt-2">Apply</button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -390,54 +382,70 @@
     </script>
 
     <script>
-        $('#sortable-bodys').sortable({
-            items: 'tr:not(.table-info)', // Exclude rows that are not sortable (e.g., headers)
-            update: function(event, ui) {
-                console.log('Sort order updated.');
+        $('#sortable-body').sortable({
+            items: 'tr:not(.table-info)', // Exclude rows with class 'table-info'
+            start: function(event, ui) {
+                if (ui.helper) {
+                    let $draggedRow = ui.helper;
+                    let $prevAll = $draggedRow.prevAll('.table-info');
+                    let initialStageId = $prevAll.first().data('staging-id');
+                    console.log('Initial stage ID:', initialStageId);
+                } else {
+                    console.error('Error: ui.helper is null in start event.');
+                }
+            },
+            stop: function(event, ui) {
+                if (ui.item) {
+                    let $droppedRow = ui.item; // Use ui.item to get the dragged row
+                    let $prevAll = $droppedRow.prevAll('.table-info');
+                    let droppedStageId = $prevAll.first().data('staging-id');
         
-                var sortedIDs = [];
-                
-                $(this).find('tr').each(function() {
-                    var id = $(this).data('id');
-                    if (id !== undefined) {
-                        sortedIDs.push(id);
-                    }
-                });
+                    let sortedIds = [];
+                    $prevAll.first().nextUntil('.table-info').each(function() {
+                        let ingredientId = $(this).data('id');
+                        if (ingredientId) {
+                            sortedIds.push(ingredientId);
+                        }
+                    });
         
-                console.log('Sorted IDs:', sortedIDs);
-                $('#loading-indicator').show();
+                    $('#loading-indicator').show();
         
-                $.ajax({
-                    url: '{% url "update_sort_order" %}',
-                    type: 'POST',
-                    data: {
-                        'csrfmiddlewaretoken': '{{ csrf_token }}',
-                        'sorted_ids': sortedIDs
-                    },
-                    success: function(response) {
-                        setTimeout(function() {
-                            $('#loading-indicator').hide();
-                            location.reload();
-                        }, 500); 
-                    },
-                    error: function() {
-                        swal({
-                            title: "Error",
-                            text: "",
-                            icon: "error",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-danger",
+                    $.ajax({
+                        url: '{% url "update_sort_order" %}',
+                        method: 'POST',
+                        data: {
+                            sorted_ids: sortedIds,
+                            staging_id: droppedStageId,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                                location.reload();
+                            }, 500); 
+                        },
+                        error: function() {
+                            swal({
+                                title: "Error",
+                                text: "",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
                                 },
-                            },
-                        });
-                    },
-                    complete: function() {
-                        setTimeout(function() {
-                            $('#loading-indicator').hide();
-                        }, 500); 
-                    }
-                });
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 500); 
+                        }
+                    });
+        
+                } else {
+                    console.error('Error: ui.item is null in stop event.');
+                }
             }
         });        
     </script>    
@@ -456,7 +464,8 @@
         .staging-form {
             border: 1px solid #ccc;
             background-color: white;
-            padding: 15px;
+            margin: 25px;
+            padding: 25px;
             white-space: nowrap;
         }
 

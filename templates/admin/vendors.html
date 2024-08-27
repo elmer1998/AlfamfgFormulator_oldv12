@@ -47,7 +47,7 @@
                                         <table class="table table-hovered" id="main_table">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col">Registered Vendors</th>
+                                                    <th scope="col"><span>Registered Vendors</span></th>
                                                 </tr>
                                             </thead>
 
@@ -187,7 +187,6 @@
 
         </div>
     </div>
-
 
     <!-- Add vendor -->
     <div class="modal fade" id="add-vendor-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -338,6 +337,9 @@
             //========================================================================================================================================
               
                 $('#main_table tbody').on('click', 'tr', function() {
+
+                    $('#main_table tbody tr').removeClass('table-active');
+                    $(this).addClass('table-active');
 
                     $('#add_vendor').addClass('d-none');
                     $('.btn-group').removeClass('d-none');
@@ -565,6 +567,15 @@
             max-height: 750px;
         }
 
+        #main_table {
+            font-size: 12px;
+        }
+
+        #main_table thead th span, 
+        #main_table tbody td span {
+            font-size: 12px;
+        }
+
         #main_table th {
             background-color: #F2F2F2;
             white-space: nowrap;
@@ -572,6 +583,10 @@
 
         #main_table_filter {
             padding: 10px;
+        }
+
+        #main_table tbody tr.selected-row {
+            background-color: #f2f2f2 !important;
         }
 
         .parts-table {

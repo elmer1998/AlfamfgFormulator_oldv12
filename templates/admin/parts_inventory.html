@@ -59,32 +59,33 @@
                                     </div>
 
                                     <div class="table-responsive main_table">
-                                        <table class="table table-hover dataTable" id="main_table" role="grid">
+                                        <table class="table display" id="main_table">
                                             <thead>
                                                 <tr>
                                                     <th scope="col"><span>Part Number</span></th>
-                                                    <th scope="col"><span>Description</span></th>
                                                 </tr>
                                             </thead>
                                         
                                             <tbody>
                                                 {% for parts_inventory in parts_inventories %}
-                                                <tr data-part-id="{{ parts_inventory.id }}"
-                                                    data-partnum="{{ parts_inventory.part_num }}"
-                                                    data-trade-name="{{ parts_inventory.trade_name }}"
-                                                    data-description="{{ parts_inventory.description }}"
-                                                    data-manufacturer-name="{{ parts_inventory.manufacturer_name }}"
-                                                    data-inventory-category="{{ parts_inventory.inventory_category }}"
-                                                    data-notes="{{ parts_inventory.notes }}"
-                                                    data-current-cost="{{ parts_inventory.std_cost }}">
-                                                    
-                                                    <td style="text-transform: uppercase;">
-                                                        <span>{{ parts_inventory.part_num }}</span>
-                                                    </td>
-                                                    <td style="text-transform: uppercase;">
-                                                        <span>{{ parts_inventory.trade_name }}</span>
-                                                    </td>
-                                                </tr>
+                                                    {% for vendor_part in parts_inventory.default_vendor_parts %}
+
+                                                        <tr data-part-id="{{ parts_inventory.id }}"
+                                                            data-partnum="{{ parts_inventory.part_num }}"
+                                                            data-trade-name="{{ parts_inventory.trade_name }}"
+                                                            data-description="{{ parts_inventory.description }}"
+                                                            data-manufacturer-name="{{ parts_inventory.manufacturer_name }}"
+                                                            data-inventory-category="{{ parts_inventory.inventory_category }}"
+                                                            data-notes="{{ parts_inventory.notes }}"
+                                                            data-current-cost="{{ parts_inventory.std_cost }}"
+                                                            data-vendor="{{ vendor_part.vendor.vendor_name }}"
+                                                            >
+                                                            
+                                                            <td style="text-transform: uppercase;">
+                                                                <span>{{ parts_inventory.part_num }}</span>
+                                                            </td>
+                                                        </tr>
+                                                    {% endfor %}
                                                 {% endfor %}
                                             </tbody>
                                         </table>                                       
@@ -236,7 +237,7 @@
                                                         <div class="col-md-4 form-group d-flex align-items-center">
                                                             <div class="form-check">
                                                                 <input type="checkbox" id="convertcost" class="form-check-input" disabled>
-                                                                <label for="convertcost" class="form-check-label ms-2">Convert cost when units change</label>
+                                                                <label for="convertcost" class="form-check-label">Convert cost when units change</label>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -690,9 +691,11 @@
                 var selectedVendorPartsId;
 
                 $('#main_table tbody').on('click', 'tr', function() {
+                    
+                    $('#main_table tbody tr').removeClass('table-active');
+                    $(this).addClass('table-active');
 
                     $('li.vendor a.nav-link').removeClass('disabled');
-
                     $('#add_inventory').addClass('d-none');
 
                     //$('.btn-group').removeClass('d-none');
@@ -708,11 +711,11 @@
                     var trade_name = $(this).data('trade-name');
                     var vendorName = $(this).data('vendor-name');
                     var vendorId = $(this).data('vendor-id');
+                    var vendor = $(this).data('vendor');
                     var manufacturerName = $(this).data('manufacturer-name');
                     var inventoryCategory = $(this).data('inventory-category');
                     var notes = $(this).data('notes');
                     var currentCost = $(this).data('current-cost');
-                    console.log('description: ', description);
                     var dashes;
 
                     if(description != "") {
@@ -728,9 +731,9 @@
                     $('#header-partnum').text(partnum);
                     $('#dashes').text(dashes);
                     $('#description').val(description === 'None' ? '' : description);
-                    $('#description').val(description || '');
+                    $('#header-description').text(trade_name);
                     $('#trade_name').val(trade_name);
-                    $('#vendor_name').val(vendorName);
+                    $('#vendor_name').val(vendor);
                     $('#vendor_id').val(vendorId);
                     $('#manufacturer_name').val(manufacturerName);
                     $('#inventory_category').val(inventoryCategory);
@@ -1758,7 +1761,6 @@
 
                 $("#main_table").DataTable({
                     dom: '<"float-start"f>',
-
                     aLengthMenu: [
                         [10, 25, 50, 100, 200, -1],
                         [10, 25, 50, 100, 200, "All"]
@@ -1899,6 +1901,10 @@
     </script>
   
     <style>
+        
+        #main_table tbody tr.selected-row {
+            background-color: #f2f2f2 !important;
+        }
 
         .main_table {
             overflow-y: auto;

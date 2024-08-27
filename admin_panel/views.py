@@ -9,6 +9,7 @@ from admin_helpers.models import Staging
 from admin_panel.models import FolderFormula, Formula, Formula_Ingredients
 from part.models import Parts
 from utilities.models import Category, Compliance, ProductFormat, ProductQualities, ProductType, SubCategory
+from django.db import transaction
 
 # Create your views here.
 
@@ -274,17 +275,14 @@ def edit_formula(request, id):
     ingredients = Formula_Ingredients.objects.filter(formula_id=id)
     associated_ingredients = Formula_Ingredients.objects.filter(formula=formula).order_by('staging', 'sortOrder')
 
-    ingredients_by_stage = defaultdict(list)
-    no_stage_ingredients = []
+    ingredient_names = '\n'.join([ing.ingredient_name for ing in associated_ingredients])
 
-    # Process ingredients based on their staging
+    ingredients_by_stage = defaultdict(list)
+    
     for ingredient in associated_ingredients:
-        if ingredient.staging and ingredient.staging.id != 1:  # Exclude staging_id 1 from stages
+        if ingredient.staging:   
             print(f"Ingredient {ingredient.ingredient_name} has staging: {ingredient.staging}")
             ingredients_by_stage[ingredient.staging].append(ingredient)
-        else:
-            # Handle No Stage
-            no_stage_ingredients.append(ingredient)
             
     formula_subcategory = {
         'subcategory_id': formula.subcategory.id,
@@ -325,7 +323,6 @@ def edit_formula(request, id):
         'associated_ingredients' : associated_ingredients,
         
         'ingredients_by_stage': dict(ingredients_by_stage),
-        'no_stage_ingredients': no_stage_ingredients,
 
     }
        
@@ -412,25 +409,18 @@ def formula_ingredient(request, formula_id):
     ingredient_names = '\n'.join([ing.ingredient_name for ing in associated_ingredients])
 
     ingredients_by_stage = defaultdict(list)
-    no_stage_ingredients = []
-
-    # Process ingredients based on their staging
+    
     for ingredient in associated_ingredients:
-        if ingredient.staging and ingredient.staging.id != 1:  # Exclude staging_id 1 from stages
+        if ingredient.staging:   
             print(f"Ingredient {ingredient.ingredient_name} has staging: {ingredient.staging}")
             ingredients_by_stage[ingredient.staging].append(ingredient)
-        else:
-            # Handle No Stage
-            no_stage_ingredients.append(ingredient)
 
-    # Get all possible stages
     staging = Staging.objects.all()
 
     return render(request, "admin/formula_ingredients.html", {
         'initials': initials,
         'formula': formula,
         'ingredients_by_stage': dict(ingredients_by_stage),
-        'no_stage_ingredients': no_stage_ingredients,
         'staging': staging,
         'ingredient_names': ingredient_names
     })
@@ -445,21 +435,35 @@ def add_ingredient(request, formula_id):
 
         formula = get_object_or_404(Formula, id=formula_id)
 
-        Formula_Ingredients.objects.filter(formula=formula).delete()
+        existing_ingredients = Formula_Ingredients.objects.filter(formula=formula)
+
+        existing_names = set(existing_ingredients.values_list('ingredient_name', flat=True))
+
+        new_names = set(ingredients_list)
+
+        ingredients_to_delete = existing_ingredients.exclude(ingredient_name__in=new_names)
+
+        ingredients_to_delete.delete()
 
         for idx, ingredient_name in enumerate(ingredients_list, start=1):
-            Formula_Ingredients.objects.create(
-                formula=formula,
-                ingredient_name=ingredient_name,
-                sortOrder=idx,
-                staging_id=1,
-            )
+            if ingredient_name in existing_names:
+                ingredient = existing_ingredients.get(ingredient_name=ingredient_name)
+                ingredient.sortOrder = idx
+                ingredient.save()
+            else:
+                Formula_Ingredients.objects.create(
+                    formula=formula,
+                    ingredient_name=ingredient_name,
+                    sortOrder=idx,
+                    staging_id=1,  
+                )
 
         formatted_ingredients = '\n'.join(ingredients_list)
 
         return JsonResponse({'success': True, 'formatted_ingredients': formatted_ingredients})
     else:
         return JsonResponse({'success': False}, status=400)
+
         
 # ============================================================================================================================================================================================================
 
@@ -474,56 +478,29 @@ def delete_ingredient(request, id):
 def update_sort_order(request):
     if request.method == 'POST':
         sorted_ids = request.POST.getlist('sorted_ids[]')
-        staging_id = request.POST.get('staging_id')  # This may be None for "No Stage"
+        new_staging_id = request.POST.get('staging_id')  
 
-        print(f"Received sorted_ids: {sorted_ids}")
-        print(f"Received staging_id: {staging_id}")
+        if not sorted_ids or new_staging_id is None:
+            return JsonResponse({'success': False, 'error': 'Invalid data.'}, status=400)
 
         sorted_ids = list(map(int, sorted_ids))
 
-        if staging_id is None:
-            print("Handling No Stage")
+        with transaction.atomic():
+            first_ingredient = Formula_Ingredients.objects.filter(id=sorted_ids[0]).first()
+            old_staging_id = first_ingredient.staging_id if first_ingredient else None
 
-            # Get IDs of ingredients with no stage
-            no_stage_ingredients = Formula_Ingredients.objects.filter(staging__isnull=True)
-            no_stage_ids = list(no_stage_ingredients.values_list('id', flat=True))
-            print(f"Number of no stage ingredients before reset: {len(no_stage_ids)}")
-            print(f"No stage ingredient IDs: {no_stage_ids}")
+            if old_staging_id:
+                Formula_Ingredients.objects.filter(staging_id=old_staging_id).exclude(id__in=sorted_ids).update(sortOrder=None)
+                for idx, ingredient in enumerate(Formula_Ingredients.objects.filter(staging_id=old_staging_id).order_by('id'), start=1):
+                    Formula_Ingredients.objects.filter(id=ingredient.id).update(sortOrder=idx)
 
-            # Reset sortOrder for all ingredients with no staging
-            Formula_Ingredients.objects.filter(staging__isnull=True).update(sortOrder=None)
-
-            # Update sortOrder for the new order starting from 1
+            Formula_Ingredients.objects.filter(staging_id=new_staging_id).update(sortOrder=None)
             for idx, ingredient_id in enumerate(sorted_ids, start=1):
-                if ingredient_id in no_stage_ids:
-                    print(f"Updating ingredient_id {ingredient_id} with sortOrder {idx}.")
-                    Formula_Ingredients.objects.filter(id=ingredient_id, staging__isnull=True).update(sortOrder=idx)
-                else:
-                    print(f"Ingredient_id {ingredient_id} not found in no stage ingredients.")
+                Formula_Ingredients.objects.filter(id=ingredient_id).update(sortOrder=idx, staging_id=new_staging_id)
 
-        else:
-            print(f"Handling staging_id {staging_id}")
-
-            # Get IDs of ingredients in the given staging
-            staging_ingredients = Formula_Ingredients.objects.filter(staging_id=staging_id)
-            staging_ids = list(staging_ingredients.values_list('id', flat=True))
-            print(f"Number of staging ingredients before reset: {len(staging_ids)}")
-            print(f"Staging ingredient IDs: {staging_ids}")
-
-            # Reset sortOrder for all ingredients in the given staging
-            Formula_Ingredients.objects.filter(staging_id=staging_id).update(sortOrder=None)
-
-            # Update sortOrder for the new order starting from 1
-            for idx, ingredient_id in enumerate(sorted_ids, start=1):
-                if ingredient_id in staging_ids:
-                    print(f"Updating ingredient_id {ingredient_id} with sortOrder {idx}.")
-                    Formula_Ingredients.objects.filter(id=ingredient_id, staging_id=staging_id).update(sortOrder=idx)
-                else:
-                    print(f"Ingredient_id {ingredient_id} not found in stage ingredients.")
-
-        return JsonResponse({'success': True})
+            return JsonResponse({'success': True})
     else:
-        return JsonResponse({'success': False}, status=400)
+        return JsonResponse({'success': False, 'error': 'Invalid request method.'}, status=400)
     
 # ============================================================================================================================================================================================================
 

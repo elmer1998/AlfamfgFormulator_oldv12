@@ -14,7 +14,10 @@
                         
                         <div class="card-header">
                             <div class="card-head-row card-tools-still-right">
-                                <h4 class="card-title">Formula</h4>
+                                <button id="generateReportBtn" class="btn btn-primary d-none">
+                                    Generate Excel Report for Selected Formulas
+                                </button>
+
                                 <div class="card-tools">
                                     <button class="btn btn-icon btn-link btn-primary btn-xs d-none" >
                                         <span class="fa fa-angle-down"></span>
@@ -58,7 +61,7 @@
                                                 {% for folders in folder_formulas_with_counts %}
                                                     <tr data-folder-id = {{ folders.id }} class="folder-row" style="font-weight: bold;">
                                                         <td class="center-align"> 
-                                                            <input type="checkbox" class="folder-checkbox" data-folder-id="{{ folders.id }}" hidden>
+                                                            <input type="checkbox" name="formula_ids" value="{{ folders.id }}" hidden>
                                                         </td>
                                                         <td>{{ folders.folder_name }}</td>
                                                         <td></td>
@@ -88,8 +91,8 @@
                                                     {% for formula in formulas %}
                                                         {% if formula.assigned_folder_id == folders.id %}
                                                             <tr class="formula-details" data-folder-id="{{ folders.id }}" style="display: none; vertical-align: middle;" data-formula-id="{{ formula.id }}" id="formula_row">
-                                                                <td class="center-align"> 
-                                                                    <input type="checkbox" class="formula-checkbox no-redirect" data-folder-id="{{ folders.id }}" hidden>
+                                                                <td class="center-align no-redirect"> 
+                                                                    <input type="checkbox" class="formula-checkbox no-redirect" name="formula_ids" value="{{ formula.id }}">
                                                                 </td>
                                                                 <td style="text-transform: uppercase;">
                                                                     <span style="padding-left: 10px;"> - &nbsp; {{ formula.formula_name }} </span>
@@ -99,8 +102,7 @@
                                                                 </td>
                                                                 <td>
                                                                     {{ formula.product_type.product_type }}
-                                                                </td>
-                                                     
+                                                                </td>                                                    
                                                                 <td>
                                                                     <div class="dropdown" style="margin-left: auto; vertical-align: middle; text-align: right; float: right;">
                                                                         <button class="unstyled-button no-redirect" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
@@ -122,7 +124,13 @@
                                             </tbody>
                                         </table>      
                                     </div>
-                                                    
+
+                                    <div class="position-relative d-none" id="reportButtonContainerSS" style="min-height: 200px;">
+                                        <button id="generateReportBtnSS" class="btn btn-primary position-absolute bottom-0 end-0 m-3">
+                                            Generate Excel Report for Selected Formulas
+                                        </button>
+                                    </div>
+
                                 </div>
                             </div>
                         </div>
@@ -438,10 +446,96 @@
 
             //========================================================================================================================================
             
-                var $anchor = $('li.formula');
+                var $anchor = $('li.li_formula');
                 $anchor.addClass('active');
 
             //========================================================================================================================================
+                
+                $('.formula-checkbox').on('change', function() {
+                    if ($('.formula-checkbox:checked').length > 0) {
+                        $('#generateReportBtn').removeClass('d-none');
+                    } else {
+                        $('#generateReportBtn').addClass('d-none');
+                    }
+                });
+        
+                $('#generateReportBtn').on('click', function(e) {
+                    e.preventDefault();
+                
+                    var selectedFormulas = [];
+                    $('.formula-checkbox:checked').each(function() {
+                        selectedFormulas.push($(this).val());
+                    });
+                
+                    if (selectedFormulas.length === 0) {
+                        alert("Please select at least one formula to generate a report.");
+                        return;
+                    }
+
+                    $('#loading-indicator').show();
+
+                    $.ajax({
+                        url: '{% url "generate_excel_report" %}',  // Ensure this is the correct endpoint
+                        method: 'POST',
+                        data: {
+                            'formula_ids': JSON.stringify(selectedFormulas),  // Send selected formula IDs
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'  // Ensure CSRF token is correctly rendered
+                        },
+                        success: function(response, status, xhr) {
+                            /*
+                            // Extract filename from Content-Disposition header
+                            var contentDisposition = xhr.getResponseHeader('Content-Disposition');
+                            var filename = 'default_filename.xlsx';  // Default filename
+                
+                            if (contentDisposition) {
+                                var matches = /filename="([^"]*)"/.exec(contentDisposition);
+                                if (matches != null) filename = matches[1];
+                            }
+                      
+                                // Create a link element and trigger download
+                                var link = document.createElement('a');
+                                link.href = window.URL.createObjectURL(response);
+                                link.download = filename;
+                    
+                                link.click();
+                                window.URL.revokeObjectURL(link.href);
+                            */
+
+                            swal("Report Generated", "You can check the generated report in the Report Module", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error generating report:', error);
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        }
+                    });
+                });
+                
             //========================================================================================================================================
             //========================================================================================================================================
             //========================================================================================================================================
@@ -449,12 +543,4 @@
         });
 
     </script>
-
-    <style>
-        .unstyled-button {
-            border: none;
-            background: none;
-            cursor: pointer;
-        }
-    </style>
 {% endblock %}
