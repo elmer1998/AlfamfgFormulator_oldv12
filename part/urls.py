@@ -8,6 +8,9 @@ from django.conf.urls.static import static
 urlpatterns = [
 # ============================================================================================================================================================================================================
     path('parts_inventory', views.parts_inventory, name='parts_inventory'),
+    path('finished_goods', views.finished_goods, name='finished_goods'),
+    path('raw_materials', views.raw_materials, name='raw_materials'),
+    path('packaging', views.packaging, name='packaging'),
 # ============================================================================================================================================================================================================
     path('add_part', views.add_part, name='add_part'),
     path('update_parts', views.update_parts, name='update_parts'),

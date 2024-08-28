@@ -6,7 +6,7 @@
     <title>Alfamfg Formulator</title>
     <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport"/>
     <link rel="icon" href="{% static 'assets/img/alfaicon.jpg' %}"type="image/x-icon"/>
-    
+  
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
     
@@ -34,10 +34,9 @@
     <link rel="stylesheet" href="{% static 'assets/css/bootstrap.min.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/plugins.min.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/kaiadmin.min.css' %}" />
-    
-    <!-- CSS Just for demo purpose, don't include it in your project -->
-    <link rel="stylesheet" href="{% static 'assets/css/demo_v1.css' %}" />
+
     <link rel="stylesheet" href="{% static 'assets/css/custom.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/jquery.dataTables.colResize.css' %}" />
 
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/css/multi-select-tag.css">
@@ -47,8 +46,15 @@
     
     <style>
         .card-title {
-            color: white;
             font-size: 14px;
+        }
+
+        .sidebar-title {
+            color: white;
+            font-weight: bold;
+            vertical-align: middle;
+            font-size: 15px;
+            margin-top: 10px;
         }
 
     </style>
@@ -59,211 +65,227 @@
 
         <div class="sidebar-logo">
           <!-- Logo Header -->
-          <div class="logo-header" data-background-color="dark">
-            <a href="/admin/dashboard" class="logo">
-              <img src="{% static 'assets/img/alfam_white.png' %}" alt="navbar brand" class="navbar-brand" width="140" height="50" />
-            </a>
-            <div class="nav-toggle">
-              <button class="btn btn-toggle toggle-sidebar">
-                <i class="gg-menu-right"></i>
-              </button>
-              <button class="btn btn-toggle sidenav-toggler">
-                <i class="gg-menu-left"></i>
-              </button>
+            <div class="logo-header" data-background-color="dark">
+                <a href="/admin/dashboard" class="logo">
+                    <img src="{% static 'assets/img/alfam_white.png' %}" alt="navbar brand" class="navbar-brand" width="125" height="60" />
+                </a>
+                <div class="nav-toggle">
+                    <button class="btn btn-toggle toggle-sidebar">
+                        <i class="gg-menu-right"></i>
+                    </button>
+                    <button class="btn btn-toggle sidenav-toggler">
+                        <i class="gg-menu-left"></i>
+                    </button>
+                </div>
+
+                <button class="topbar-toggler more">
+                <i class="gg-more-vertical-alt"></i>
+                </button>
             </div>
-            <button class="topbar-toggler more">
-              <i class="gg-more-vertical-alt"></i>
-            </button>
-          </div>
           <!-- End Logo Header -->
         </div>
 
         <div class="sidebar-wrapper scrollbar scrollbar-inner">
-          <div class="sidebar-content">
-            <ul class="nav nav-secondary">
+            <div class="sidebar-content">
+                <ul class="nav nav-secondary">
+                    
+                <li class="nav-item">
+                    <a href="/admin/dashboard">
+                    <i class="fas fa-home"></i>
+                    <p>Dashboard</p>
+                    <span class="caret d-none"></span>
+                    </a>
+                </li>
+
+                    <li class="nav-section">
+                        <span class="sidebar-mini-icon">
+                        <i class="fa fa-ellipsis-h"></i>
+                        </span>
+                        <h4 class="text-section">Components</h4>
+                    </li>
                 
-              <li class="nav-item">
-                <a href="/admin/dashboard">
-                  <i class="fas fa-home"></i>
-                  <p>Dashboard</p>
-                  <span class="caret d-none"></span>
-                </a>
-              </li>
+                    <li class="nav-item li_formula">
+                        <a href="/admin/formula">
+                            <i class="fas fa-desktop"></i>
+                            <p>Formula</p>
+                            <span class="badge badge-success d-none">4</span>
+                        </a>
+                    </li>
 
-                <li class="nav-section">
-                    <span class="sidebar-mini-icon">
-                    <i class="fa fa-ellipsis-h"></i>
-                    </span>
-                    <h4 class="text-section">Components</h4>
-                </li>
-              
-                <li class="nav-item li_formula">
-                    <a href="/admin/formula">
-                        <i class="fas fa-desktop"></i>
-                        <p>Formula</p>
-                        <span class="badge badge-success d-none">4</span>
-                    </a>
-                </li>
+                    <li class="nav-item sidebar_parts_inventory">
+                        <a data-bs-toggle="collapse" href="#parts_inventory_nav">
+                            <i class="fas fa-layer-group"></i>
+                            <p>Parts Inventory</p>
+                            <span class="caret"></span>
+                        </a>
+                        
+                        <div class="collapse" id="parts_inventory_nav">
+                            <ul class="nav nav-collapse">
+                                <li class="li_parts_inventory">
+                                    <a href="/parts/parts_inventory">
+                                        <span class="sub-item">All Parts Category</span>
+                                    </a>
+                                </li>
 
-                <li class="nav-item sidebar_parts_inventory">
-                    <a data-bs-toggle="collapse" href="#parts_inventory_nav">
-                        <i class="fas fa-layer-group"></i>
-                        <p>Parts Inventory</p>
-                        <span class="caret"></span>
-                    </a>
+                                <li class="li_raw_materials">
+                                    <a href="/parts/raw_materials">
+                                        <span class="sub-item">Raw Materials</span>
+                                    </a>
+                                </li>
+
+                                <li class="li_packaging">
+                                    <a href="/parts/packaging">
+                                        <span class="sub-item">Packaging</span>
+                                    </a>
+                                </li>
+
+                                <li class="li_finished_goods">
+                                    <a href="/parts/finished_goods">
+                                        <span class="sub-item">Finished Goods</span>
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="nav-item sidebar_vendors">
+                        <a href="/vendor/vendors">
+                            <i class="fas fa-warehouse"></i>
+                            <p>Vendor</p>
+                            <span class="badge badge-success d-none">4</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item sidebar_inci d-none">
+                        <a href="/admin/inci_names">
+                            <i class="fas fa-flask"></i>
+                            <p>Inci Names</p>
+                            <span class="badge badge-success d-none">4</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item sidebar_ingredients d-none">
+                        <a data-bs-toggle="collapse" href="#ingredients_nav">
+                            <i class="fas fa-layer-group"></i>
+                            <p>Ingredients</p>
+                            <span class="caret"></span>
+                        </a>
+                        
+                        <div class="collapse" id="ingredients_nav">
+                            <ul class="nav nav-collapse">
+                                <li class="li_inci_names">
+                                    <a href="/admin/inci_names">
+                                        <span class="sub-item">INCI Names</span>
+                                    </a>
+                                </li>
+                                <li class="li_allergens">
+                                    <a href="#">
+                                        <span class="sub-item">Allergens</span>
+                                    </a>
+                                </li>
+                                <li class="li_impurities">
+                                    <a href="#">
+                                        <span class="sub-item">Impurities</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
                     
-                    <div class="collapse" id="parts_inventory_nav">
-                        <ul class="nav nav-collapse">
-                            <li>
-                                <a href="/parts/parts_inventory">
-                                    <span class="sub-item">All Parts Category</span>
-                                </a>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                </li>
+                    <li class="nav-item li_generated_reports">
+                        <a href="/reports/generated_reports">
+                            <i class="fas fa-file-alt"></i>
+                            <p>Reports</p>
+                            <span class="badge badge-success d-none">4</span>
+                        </a>
+                    </li>
 
-                <li class="nav-item sidebar_vendors">
-                    <a href="/vendor/vendors">
-                        <i class="fas fa-warehouse"></i>
-                        <p>Vendor</p>
-                        <span class="badge badge-success d-none">4</span>
-                    </a>
-                </li>
+                    <hr class="hr" />
 
-                <li class="nav-item sidebar_inci d-none">
-                    <a href="/admin/inci_names">
-                        <i class="fas fa-flask"></i>
-                        <p>Inci Names</p>
-                        <span class="badge badge-success d-none">4</span>
-                    </a>
-                </li>
+                    <li class="nav-item li_users">
+                        <a href="/utilities/registered_users">
+                            <i class="fas fa-users"></i>
+                            <p>Users</p>
+                            <span class="badge badge-success d-none">4</span>
+                        </a>
+                    </li>
 
-                <li class="nav-item sidebar_ingredients d-none">
-                    <a data-bs-toggle="collapse" href="#ingredients_nav">
-                        <i class="fas fa-layer-group"></i>
-                        <p>Ingredients</p>
-                        <span class="caret"></span>
-                    </a>
-                    
-                    <div class="collapse" id="ingredients_nav">
-                        <ul class="nav nav-collapse">
-                            <li class="li_inci_names">
-                                <a href="/admin/inci_names">
-                                    <span class="sub-item">INCI Names</span>
-                                </a>
-                            </li>
-                            <li class="li_allergens">
-                                <a href="#">
-                                    <span class="sub-item">Allergens</span>
-                                </a>
-                            </li>
-                            <li class="li_impurities">
-                                <a href="#">
-                                    <span class="sub-item">Impurities</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-                
+                    <hr class="hr" />
 
-                <li class="nav-item li_generated_reports">
-                    <a href="/reports/generated_reports">
-                        <i class="fas fa-file-alt"></i>
-                        <p>Reports</p>
-                        <span class="badge badge-success d-none">4</span>
-                    </a>
-                </li>
+                    <li class="nav-item li_user" style="width: 100%; bottom: 0;">
+                        <a href="/signout">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <p>Logout</p>
+                            <span class="badge badge-success d-none">4</span>
+                        </a>
+                    </li>
 
-                <hr class="hr" />
-
-                <li class="nav-item li_users">
-                    <a href="/utilities/registered_users">
-                        <i class="fas fa-users"></i>
-                        <p>Users</p>
-                        <span class="badge badge-success d-none">4</span>
-                    </a>
-                </li>
-
-                <hr class="hr" />
-
-                <li class="nav-item li_user" style="width: 100%; bottom: 0;">
-                    <a href="/signout">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <p>Logout</p>
-                        <span class="badge badge-success d-none">4</span>
-                    </a>
-                </li>
-
-                <li class="nav-item d-none">
-                    <a data-bs-toggle="collapse" href="#forms">
-                        <i class="fas fa-wrench"></i>
-                        <p>Utilites</p>
-                        <span class="caret"></span>
-                    </a>
-                    
-                    <div class="collapse" id="forms">
-                        <ul class="nav nav-collapse">
-                            <li>
-                                <a href="/utilities/registered_users">
-                                    <span class="sub-item">Users</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/categories">
-                                    <span class="sub-item">Categories</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/subcategories">
-                                    <span class="sub-item">Subcategories</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/product_type">
-                                    <span class="sub-item">Product Type</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/product_format">
-                                    <span class="sub-item">Product Format</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/product_qualities">
-                                    <span class="sub-item">Product Qualities</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/compliance">
-                                    <span class="sub-item">Compliance</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/applications">
-                                    <span class="sub-item">Applications</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/certifications">
-                                    <span class="sub-item">Certifications</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/utilities/functions">
-                                    <span class="sub-item">Functions</span>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                </li>
-
-            </ul>
-
-          </div>
+                    <li class="nav-item d-none">
+                        <a data-bs-toggle="collapse" href="#forms">
+                            <i class="fas fa-wrench"></i>
+                            <p>Utilites</p>
+                            <span class="caret"></span>
+                        </a>
+                        
+                        <div class="collapse" id="forms">
+                            <ul class="nav nav-collapse">
+                                <li>
+                                    <a href="/utilities/registered_users">
+                                        <span class="sub-item">Users</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/categories">
+                                        <span class="sub-item">Categories</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/subcategories">
+                                        <span class="sub-item">Subcategories</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/product_type">
+                                        <span class="sub-item">Product Type</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/product_format">
+                                        <span class="sub-item">Product Format</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/product_qualities">
+                                        <span class="sub-item">Product Qualities</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/compliance">
+                                        <span class="sub-item">Compliance</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/applications">
+                                        <span class="sub-item">Applications</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/certifications">
+                                        <span class="sub-item">Certifications</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/utilities/functions">
+                                        <span class="sub-item">Functions</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                    </li>
+                </ul>
+            </div>
         </div>
       </div>
       <!-- End Sidebar -->
@@ -455,8 +477,10 @@
         });
     </script>
 
-    <!--   Core JS Files   -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 
+    <!--   Core JS Files   -->
     <script src="{% static 'assets/js/core/jquery-3.7.1.min.js' %}"></script>
     <script src="{% static 'assets/js/core/popper.min.js' %}"></script>
     <script src="{% static 'assets/js/core/bootstrap.min.js' %}"></script>
@@ -489,12 +513,7 @@
     <!-- Kaiadmin JS -->
     <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
     
-    <!-- Kaiadmin DEMO methods, don't include it in your project! -->
-    <script src="{% static 'assets/js/setting-demo.js' %}"></script>
-    <script src="{% static 'assets/js/demos.js' %}"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/habibmhamadi/multi-select-tag@3.1.0/dist/js/multi-select-tag.js"></script>
+    <script src="{% static 'assets/js/jquery.dataTables.colResize.js' %}"></script>
 
   </body>
 </html>

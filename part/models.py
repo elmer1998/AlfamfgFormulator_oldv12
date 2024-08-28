@@ -15,7 +15,9 @@ class Parts(models.Model):
     packaging_type = models.CharField(max_length=255, null=True, blank=True)
     chemical_type = models.CharField(max_length=255, null=True, blank=True)
     notes = models.CharField(max_length=255, null=True, blank=True)
-    
+    activeFlag = models.BooleanField(default=False)
+    lastChangedUser = models.CharField(max_length=255, null=True, blank=True)
+
     std_cost = models.CharField(max_length=255, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 

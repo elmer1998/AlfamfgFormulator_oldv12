@@ -18,7 +18,7 @@ def parts_inventory(request):
 
     latest_updated_at = VendorParts.objects.filter(
         part=OuterRef('part'),
-        defaultFlag=True
+        activeFlag=True
     ).values('part').annotate(
         latest_updated_at=Max('updated_at')
     ).values('latest_updated_at')
@@ -26,7 +26,7 @@ def parts_inventory(request):
     vendor_parts_prefetch = Prefetch(
         'vendorparts_set',
         queryset=VendorParts.objects.filter(
-            defaultFlag=True,
+            activeFlag=True,
             updated_at=Subquery(latest_updated_at)
         ),
         to_attr='default_vendor_parts'
@@ -34,7 +34,90 @@ def parts_inventory(request):
 
     parts_inventories = Parts.objects.prefetch_related(vendor_parts_prefetch).all()
 
-    return render(request, "admin/parts_inventory.html", {
+    return render(request, "parts/parts_inventory.html", {
+        'initials': initials,
+        'parts_inventories': parts_inventories,
+    })
+
+# ============================================================================================================================================================================================================
+
+def finished_goods(request):
+    user = request.user
+    initials = get_user_initials(user)
+
+    latest_updated_at = VendorParts.objects.filter(
+        part=OuterRef('part'),
+        activeFlag=True
+    ).values('part').annotate(
+        latest_updated_at=Max('updated_at')
+    ).values('latest_updated_at')
+
+    vendor_parts_prefetch = Prefetch(
+        'vendorparts_set',
+        queryset=VendorParts.objects.filter(
+            activeFlag=True,
+            updated_at=Subquery(latest_updated_at)
+        ),
+        to_attr='default_vendor_parts'
+    )
+
+    parts_inventories = Parts.objects.prefetch_related(vendor_parts_prefetch).filter(inventory_category="FINISHED GOODS")
+
+    return render(request, "parts/finished_goods.html", {
+        'initials': initials,
+        'parts_inventories': parts_inventories,
+    })
+
+def raw_materials(request):
+    user = request.user
+    initials = get_user_initials(user)
+
+    latest_updated_at = VendorParts.objects.filter(
+        part=OuterRef('part'),
+        activeFlag=True
+    ).values('part').annotate(
+        latest_updated_at=Max('updated_at')
+    ).values('latest_updated_at')
+
+    vendor_parts_prefetch = Prefetch(
+        'vendorparts_set',
+        queryset=VendorParts.objects.filter(
+            activeFlag=True,
+            updated_at=Subquery(latest_updated_at)
+        ),
+        to_attr='default_vendor_parts'
+    )
+
+    parts_inventories = Parts.objects.prefetch_related(vendor_parts_prefetch).filter(inventory_category="RAW MATERIALS")
+
+    return render(request, "parts/raw_materials.html", {
+        'initials': initials,
+        'parts_inventories': parts_inventories,
+    })
+    
+def packaging(request):
+    user = request.user
+    initials = get_user_initials(user)
+
+    latest_updated_at = VendorParts.objects.filter(
+        part=OuterRef('part'),
+        activeFlag=True
+    ).values('part').annotate(
+        latest_updated_at=Max('updated_at')
+    ).values('latest_updated_at')
+
+    vendor_parts_prefetch = Prefetch(
+        'vendorparts_set',
+        queryset=VendorParts.objects.filter(
+            activeFlag=True,
+            updated_at=Subquery(latest_updated_at)
+        ),
+        to_attr='default_vendor_parts'
+    )
+
+    parts_inventories = Parts.objects.prefetch_related(vendor_parts_prefetch).filter(inventory_category="PACKAGING")
+
+    return render(request, "parts/packaging.html", {
         'initials': initials,
         'parts_inventories': parts_inventories,
     })
