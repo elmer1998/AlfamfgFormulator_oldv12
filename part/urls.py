@@ -26,6 +26,7 @@ urlpatterns = [
     path('part/<int:part_id>/ingredients/impurities', views.get_impurities, name='get_impurities'),
     path('delete_ingredients/<int:id>/', views.delete_ingredients, name='delete_ingredients'),
 # ============================================================================================================================================================================================================
+    path('vendor_download/<str:filename>/', views.vendor_download, name='vendor_download'),
 
 ]
 

@@ -11,6 +11,7 @@ class Vendor(models.Model):
     lastChangedUser = models.CharField(max_length=255, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True, blank=True, null=True)
+    vendor_type = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         db_table = 'vendor'

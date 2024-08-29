@@ -58,6 +58,7 @@
                                                     data-vendor-name = "{{ vendor.vendor_name }}"
                                                     data-vendor-default = "{{ vendor.default }}"
                                                     data-status = "{{ vendor.status }}"
+                                                    data-vendor-type = "{{ vendor.vendor_type }}"
                                                     data-created-at = "{{ vendor.created_at }}"
                                                     data-updated-at = "{{ vendor.updated_at }}"
                                                 >
@@ -77,7 +78,7 @@
                                         <div class="card-header d-flex align-items-center justify-content-between" style="background-color: darkblue;">
                                             <h4 class="card-title" style="color: white;">Vendor Details: <span class="ms-3" id="header-vendor"></span> </h4>
 
-                                            <button href="#" id="add_vendor" class="btn btn-icon btn-link btn-primary btn-xs" data-bs-toggle="modal" data-bs-target="#add-vendor-modal">
+                                            <button href="#" id="add_vendor" class="btn btn-icon btn-link btn-primary btn-xs d-none" data-bs-toggle="modal" data-bs-target="#add-vendor-modal">
                                                 <span class="fa fa-plus" style="color: white;"></span>
                                             </button>
             
@@ -126,18 +127,29 @@
                                                         <input type="checkbox" id="default" value="true" disabled>                                                  
                                                     </div>
 
-                                         
-                                                     <fieldset class="border rounded-3 p-3 pt-4">
+                                                    <fieldset class="border rounded-3 p-3 pt-4">
                                                         <legend> Details:</legend>
 
-                                                        <div class="col form-group d-flex align-items-center pt-4">
-                                                            <label class="ms-5" for="default" style="min-width: 120px;">Date Created: </label>
-                                                            <p id="created_at" style="min-width: 400px;"></p>
-                                                            <label class="ms-5" for="default" style="min-width: 120px;">Date Updated: </label>
-                                                            <p id="updated_at"></p>
+                                                        <div class="row pt-4">
+                                                            <div class="col d-flex align-items-center">
+                                                                <label class="ms-5" for="default" style="min-width: 120px;">Vendor Type: </label>
+                                                                <p id="vendor_type" class="mb-0 ms-2" style="min-width: 400px;"></p>
+                                                            </div>
                                                         </div>
 
-                                                     </fieldset>
+                                                        <div class="row pt-4">
+                                                            <div class="col d-flex align-items-center">
+                                                                <label class="ms-5" for="default" style="min-width: 120px;">Date Created: </label>
+                                                                <p id="created_at" class="mb-0 ms-2" style="min-width: 400px;"></p>
+                                                            </div>
+                                                        
+                                                            <div class="col d-flex align-items-center">
+                                                                <label class="ms-5" for="default" style="min-width: 120px;">Date Updated: </label>
+                                                                <p id="updated_at" class="mb-0 ms-2"></p>
+                                                            </div>
+                                                        </div>
+                                                        
+                                                    </fieldset>
                                                     
                                                 </div>
                                                 
@@ -342,7 +354,7 @@
                     $(this).addClass('table-active');
 
                     $('#add_vendor').addClass('d-none');
-                    $('.btn-group').removeClass('d-none');
+                    //$('.btn-group').removeClass('d-none');
                     $('li.parts').removeClass('d-none');
                     
                     $('#vendor').prop('disabled', false);
@@ -352,6 +364,7 @@
                     var vendorname = $(this).data('vendor-name');
                     var vendordefault = $(this).data('vendor-default');
                     var status = $(this).data('status');
+                    var vendorType = $(this).data('vendor-type');
                     var partId = $(this).data('partId');
                     var created_at = $(this).data('created-at');
                     var updated_at = $(this).data('updated-at');
@@ -363,6 +376,7 @@
                         isChecked = vendordefault.toLowerCase() === 'true';
                     }
 
+                    $('#vendor_type').text(vendorType != 'None' ? vendorType : 'NON CATEGORIZED');
                     $('#vendorId').val(vendorid);
                     $('#partId').val(partId);
                     $('#vendor').val(vendorname);
@@ -391,7 +405,7 @@
                                     '<tr class="center-align">' +
                                         '<td><span>' + (index + 1) + '.' + '</span></td>' + // Add the numbering here
                                         '<td class="left-align"><span>' + parts.part_num + '</span></td>' +
-                                        '<td class="left-align"><span>' + parts.trade_name + '</span></td>' +
+                                        '<td class="left-align"><span>' + parts.description + '</span></td>' +
                                         '<td><span>$' + vendorLastCost + '</span></td>' +
                                         '<td><span></span></td>' +
                                         '<td class="left-align"><span>' + parts.part_num + '</span></td>' +

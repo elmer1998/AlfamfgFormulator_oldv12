@@ -33,6 +33,7 @@ class PartDocument(models.Model):
     upload_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     vendorparts = models.ForeignKey('vendor.VendorParts', on_delete=models.CASCADE, null=True, blank=True)
+    status = models.IntegerField(blank=True, null=True)
 
     class Meta:
         db_table = 'part_document'

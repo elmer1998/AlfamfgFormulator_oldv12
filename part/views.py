@@ -1,12 +1,14 @@
 import os
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from admin_helpers.models import Ingredients
 from admin_panel.views import get_user_initials
+from alfamfg_formulator import settings
 from part.models import PartDocument, Parts
 from vendor.models import Vendor, VendorParts
 from django.core.files.storage import default_storage
 from django.db.models import OuterRef, Subquery, Max, Prefetch
+from django.core.files.storage import FileSystemStorage
 
 # Create your views here.
 
@@ -188,19 +190,38 @@ def update_parts(request):
 
 # ============================================================================================================================================================================================================
 
+def vendor_download(request, filename):
+    file_path = os.path.join(settings.BASE_DIR, 'Vendor Pricing', filename)
+    if os.path.exists(file_path):
+        return FileResponse(open(file_path, 'rb'), as_attachment=True, filename=filename)
+    else:
+        raise Http404("File does not exist")
+    
 def upload_partdocuments(request):
     if request.method == 'POST':
+        vendor = request.POST.get('vendor-readonly')
+        vendorpart = request.POST.get('vendorpartnum-readonly')
+
         vendorparts_id = request.POST.get('vendorparts_id')
         files = request.FILES.getlist('documents')
-        type = request.POST.get('document_type')
+        document_type = request.POST.get('document_type')
 
         for f in files:
-            file_name = default_storage.save(f.name, f)
-            
-            PartDocument.objects.create(vendorparts_id=vendorparts_id, file=file_name, type=type)
+            # Extract the original file extension
+            original_extension = os.path.splitext(f.name)[1]  # e.g., .jpg, .csv
+
+            # Create a custom filename that includes the original filename, vendor, and vendorpartnum
+            new_filename = f"{os.path.splitext(f.name)[0]} - {vendor} - {vendorpart}{original_extension}"
+
+            # Save the file with the custom filename
+            fs = FileSystemStorage(location=settings.MEDIA_ROOT)
+            saved_filename = fs.save(new_filename, f)
+
+            # Save the file information to the database
+            PartDocument.objects.create(vendorparts_id=vendorparts_id, file=saved_filename, type=document_type)
 
         return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
-
+    
 def delete_part_document(request, document_id):
     document = get_object_or_404(PartDocument, id=document_id)
     

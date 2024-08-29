@@ -153,13 +153,13 @@
                                                 <li class="nav-item li_properties d-none">
                                                     <a class="nav-link" id="pills-properties-tab" data-bs-toggle="pill" href="#pills-properties" role="tab" aria-controls="pills-properties" aria-selected="false">Properties</a>
                                                 </li>
+                                                <li class="nav-item li_costing_history d-none">
+                                                    <a class="nav-link" id="pills-costing-history-tab" data-bs-toggle="pill" href="#pills-costing-history" role="tab" aria-controls="pills-costing-history" aria-selected="false">Costing History</a>
+                                                </li>
                                                 <li class="nav-item li_technical_specs d-none">
                                                     <a class="nav-link" id="pills-technical-specs-tab" data-bs-toggle="pill" href="#pills-technical-specs" role="tab" aria-controls="pills-technical-specs" aria-selected="false">Technical Specs</a>
                                                 </li>
-                                                <li class="nav-item li_bom d-none">
-                                                    <a class="nav-link" id="pills-bom-tab" data-bs-toggle="pill" href="#pills-bom" role="tab" aria-controls="pills-bom" aria-selected="false">Bill of Materials</a>
-                                                </li>
-                                                <li class="nav-item vendor d-none">
+                                                <li class="nav-item li_vendor d-none">
                                                     <a class="nav-link" id="pills-vendor-tab" data-bs-toggle="pill" href="#pills-vendor" role="tab" aria-controls="pills-vendor" aria-selected="false">Vendor</a>
                                                 </li>
                                                 <li class="nav-item li_regulatory d-none">
@@ -324,7 +324,8 @@
 
                                                 </div>
 
-                                                <div class="tab-pane fade" id="pills-vendor" role="tabpanel" aria-labelledby="pills-vendor">
+                                                <div class="tab-pane fade" id="pills-costing-history" role="tabpanel" aria-labelledby="pills-costing-history-tab">
+
                                                     <div class="table-responsive vendor-table pt-4">
                                                        
                                                         <table class="table display table-bordered" id="vendor-table">
@@ -360,6 +361,13 @@
                         
                                                     </div>
                                                     
+
+                                                </div>
+
+                                                <div class="tab-pane fade" id="pills-vendor" role="tabpanel" aria-labelledby="pills-vendor">
+                                                    <hr>
+                                                    <div id="vendor-checklists" class="pt-4"> </div>
+
                                                 </div>
 
                                                 <div class="tab-pane fade" id="pills-technical-specs" role="tabpanel" aria-labelledby="pills-technical-specs-tab">
@@ -467,19 +475,9 @@
                                                 </div>
 
                                                 <div class="tab-pane fade" id="pills-documents" role="tabpanel" aria-labelledby="pills-documents-tab">
-
-                                                    <div class="pt-4">
-
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#add-document-modal">
-                                                            <p>+ Add Document</p>
-                                                        </a>
-                                                    </div>
-
                                                     <hr>
 
-                                                    <div id="vendor-document-checklists">
-
-                                                    </div>
+                                                    <div id="vendor-document-checklists" class="pt-4"> </div>
                                                 </div>
 
                                             </div>
@@ -585,22 +583,30 @@
 
                     <div class="modal-body">
 
+                        <input type="text" class="form-control vendorparts_id" name="vendorparts_id" id="selected_vendorparts_id" hidden>
+
                         <div class="form-group d-flex align-items-center">
-                            <label for="vendor_id" style="min-width: 100px;">Vendor</label>
-                            <select class="form-select" name="vendorparts_id" id="vendor_select_for_docs_modal" required> </select>
+                            <label for="vendor_id" style="min-width: 150px;">Vendor</label>
+                            <input type="text" class="form-control vendor-readonly" name="vendor-readonly" id="vendorName" readonly>
                         </div>
 
                         <div class="form-group d-flex align-items-center">
-                            <label for="vendor_id" style="min-width: 100px;">Upload File/s</label>
-                            <input type="file" class="documents" id="fileInput" name="documents" class="form-control" style="display: none;" />
+                            <label for="vendor_id" style="min-width: 150px;">Vendor Part Number</label>
+                            <input type="text" class="form-control vendorpartnum-readonly" name="vendorpartnum-readonly" id="vendorPartNum" readonly>
+
+                        </div>
+
+                        <div class="form-group d-flex align-items-center">
+                            <label for="vendor_id" style="min-width: 150px;">Upload File/s</label>
+                            <input type="file" class="form-control document_input" id="fileInputS" name="documents" accept=".jpeg,.jpg,.png,.pdf,.xls,.csv"/>
     
-                            <div id="fileListContainer" class="form-control" style="height: auto; overflow-y: auto; cursor: pointer;" required>
+                            <div id="fileListContainer" class="form-control d-none" style="height: auto; overflow-y: auto; cursor: pointer;" required>
                                 <p id="placeholderText" style="color: gray;">Click to select files</p>
                             </div>
                         </div>
 
                         <div class="form-group d-flex align-items-center">
-                            <label for="document_type" style="min-width: 100px;">Document <br> Type</label>
+                            <label for="document_type" style="min-width: 150px;">Document <br> Type</label>
                             <select id="document_type" name="document_type" class="form-select" required></select>
                         </div>
 
@@ -608,7 +614,7 @@
 
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-primary" type="submit" id="add_document">Add </button>                        
+                        <button class="btn btn-primary" type="submit">Submit Document </button>                        
                     </div>
                 </form>
             </div>
@@ -645,7 +651,7 @@
     <!-- Script -->
     <script>
         $(document).ready(function() { 
-            //========================================================================================================================================
+            //======================================UTILITIES LOGIC==================================================================================================
 
                 $('input, textarea').prop('disabled', true);
 
@@ -655,7 +661,21 @@
 
                 $('button#add_inventory').css('visibility', 'hidden');
 
-            //========================================================================================================================================
+                $(document).on('click', '.accordion-vendor', function() {
+                    const chevronDown = $(this).find('.icon-arrow-down');
+                    const chevronUp = $(this).find('.icon-arrow-up');
+                    chevronDown.toggleClass('d-none');
+                    chevronUp.toggleClass('d-none');
+                });
+
+                $(document).on('click', '.accordion-document', function() {
+                    const chevronDown = $(this).find('.icon-arrow-down');
+                    const chevronUp = $(this).find('.icon-arrow-up');
+                    chevronDown.toggleClass('d-none');
+                    chevronUp.toggleClass('d-none');
+                });
+
+            //======================================MAIN TABLE CLICK LOGIC==================================================================================================
                 
                 $('#pills-technical-specs-tab').on('click', function(e) {
                     if ($(this).hasClass('disabled')) {
@@ -672,6 +692,10 @@
                     $('p.card-title').removeClass('d-none');
 
                     $('input.documents').prop('disabled', false);
+                    $('input.vendorparts_id').prop('disabled', false);
+                    $('input.document_input').prop('disabled', false);
+                    $('input.vendor-readonly').prop('disabled', false);
+                    $('input.vendorpartnum-readonly').prop('disabled', false);
 
                     $('#main_table tbody tr').removeClass('table-active');
                     $(this).addClass('table-active');
@@ -681,10 +705,11 @@
 
                     //$('.btn-group').removeClass('d-none');
                     
-                    $('li.vendor').removeClass('d-none');
+                    $('li.li_vendor').removeClass('d-none');
+                    $('li.li_costing_history').removeClass('d-none');
                     $('li.li_technical_specs').removeClass('d-none');
                     $('li.li_documents').removeClass('d-none');
-
+                    
                     var partnum = $(this).data('partnum');
                     var partId = $(this).data('part-id');
                     var partIdVendor = $(this).data('part-id');
@@ -900,6 +925,9 @@
 
                             VendorSelectFormModal.append(new Option('Select Vendor', ''));
 
+                            var vendorChecklists = $('#vendor-checklists');
+                            vendorChecklists.empty();
+
                             var vendorDocumentChecklists = $('#vendor-document-checklists');
                             vendorDocumentChecklists.empty();
 
@@ -910,7 +938,7 @@
                                     var vendorLastCost = parseFloat(vendorparts.lastcost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     var row = 
                                         '<tr>' +
-                                            '<td>' + (index + 1) + '.' + '</td>' + // Add the numbering here
+                                            '<td>' + (index + 1) + '.' + '</td>' + 
                                             '<td>' + vendorparts.vendor_name + '</td>' +
                                             '<td>' + '$' + vendorLastCost + '</td>' +
                                             '<td></td>' +
@@ -919,28 +947,109 @@
                                             '<td></td>' +
                                             '<td>' + vendorparts.vendor_partnum + '</td>' +
                                             '<td class="center-align">' + (vendorparts.leadtime ? vendorparts.leadtime : '') + '</td>' +
-                                            '<td><div class="d-none delete-part-vendor-name" data-vendor-id="' + vendorparts.vendor_id + '">' +
+                                            '<td><div class="d-none delete-part-vendor-name" data-vendor-id="' + vendorparts.vendorparts_id + '">' +
                                                 '<button class="btn btn-danger btn-sm delete_vendor" type="button">Remove</button>' +
                                             '</div></td>' +
                                             '</tr>';
                                         
                                     tbody.append(row);
-                                    vendorSelect.append(new Option(vendorparts.vendor_name, vendorparts.vendor_id));
-                                    VendorSelectFormModal.append(new Option(vendorparts.vendor_name, vendorparts.vendor_id));
+                                    vendorSelect.append(new Option(vendorparts.vendor_name, vendorparts.vendorparts_id));
+                                    VendorSelectFormModal.append(new Option(vendorparts.vendor_name, vendorparts.vendorparts_id));
 
                                     var checklistHtml = `
                                         <div class="accordion-item">
-                                            <h2 class="accordion-header" id="heading_${vendorparts.vendor_id}">
-                                                <button class="accordion-button collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${vendorparts.vendor_id}" aria-expanded="false" aria-controls="collapse_${vendorparts.vendor_id}">
-                                                <i class="icon-arrow-down fas fa-chevron-down"></i>
-                                                <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
-                                                <span class="ms-5" style="font-weight: bold;">${vendorparts.vendor_name}</span>
+                                            <h2 class="accordion-header" id="heading_${vendorparts.vendorparts_id}">
+                                                <button class="accordion-button accordion-vendor collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${vendorparts.vendorparts_id}" aria-expanded="false" aria-controls="collapse_${vendorparts.vendorparts_id}">
+                                                    <i class="icon-arrow-down fas fa-chevron-down"></i>
+                                                    <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
+                                                    <span class="fw-bold ms-5">
+                                                        ${vendorparts.vendor_name} - ${vendorparts.vendor_partnum} 
+                                                        [${vendorparts.vendor_type ? vendorparts.vendor_type : 'NON CATEGORIZED'}]
+                                                    </span>
                                                 </button>
                                             </h2>
-                                            <div id="collapse_${vendorparts.vendor_id}" class="accordion-collapse collapse" aria-labelledby="heading_${vendorparts.vendor_id}" data-bs-parent="#vendorDocumentChecklists">
+                                            
+                                            <div id="collapse_${vendorparts.vendorparts_id}" class="accordion-collapse collapse" aria-labelledby="heading_${vendorparts.vendorparts_id}" data-bs-parent="#vendorDocumentChecklists">
                                                 <div class="accordion-body">
                                                     <br>
                                                     <div class="table-responsive">
+                                                        <table class="table table-bordered" id="document-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Document Name</th>
+                                                                    <th>File Name</th>
+                                                                    <th>Vendor Type</th>
+                                                                    <th class="center-align">Status</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                ${generateDocumentRow('Technical Data Sheet')}
+                                                                ${generateDocumentRow('Safety Data Sheet (SDS)')}
+                                                                ${generateDocumentRow('Material Questionnaire')}
+                                                                ${generateDocumentRow('Composition Statement')}
+                                                                ${generateDocumentRow('No Animal Testing')}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><hr>
+                                    `;
+                                    
+                                    function generateDocumentRow(docType) {
+                                        var doc = vendorparts.documents.find(doc => doc.type === docType);
+                                        if (doc) {
+                                            // Assuming `doc.file` includes the filename
+                                            var fileName = doc.file.split('/').pop();  // Extracts the filename from the path
+                                            return `
+                                                <tr class="has-file">
+                                                    <td>${docType}</td>
+                                                    <td>
+                                                        ${fileName}
+                                                        <a href="/parts/vendor_download/${fileName}" class="ms-3 align-middle">
+                                                            <i class="fas fa-download align-middle"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="center-align"></td>
+                                                    <td class="center-align"></td>
+                                                </tr>
+                                            `;
+                                        } else {
+                                            return `
+                                                <tr>
+                                                    <td>${docType}</td>
+                                                    <td>No file uploaded</td>
+                                                    <td class="center-align"></td>
+                                                </tr>
+                                            `;
+                                        }
+                                    }
+                                
+                                    vendorChecklists.append(checklistHtml);
+
+                                    var checklistDocumentHtml = `
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading_${vendorparts.vendorparts_id}_1">
+                                                <button class="accordion-button accordion-document collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${vendorparts.vendorparts_id}_1" aria-expanded="false" aria-controls="collapse_${vendorparts.vendorparts_id}">
+                                                    <i class="icon-arrow-down fas fa-chevron-down"></i>
+                                                    <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
+                                                    <span class="fw-bold ms-5">
+                                                        ${vendorparts.vendor_name} - ${vendorparts.vendor_partnum} 
+                                                        [${vendorparts.vendor_type ? vendorparts.vendor_type : 'NON CATEGORIZED'}]
+                                                    </span>
+                                                </button>
+                                            </h2>
+                                            <div id="collapse_${vendorparts.vendorparts_id}_1" class="accordion-collapse collapse" aria-labelledby="heading_${vendorparts.vendorparts_id}_1" data-bs-parent="#vendorDocumentChecklists">
+                                                <div class="accordion-body">
+                                                    <br>
+                                                    <div class="table-responsive">
+                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#add-document-modal" 
+                                                            data-vendor-name="${vendorparts.vendor_name}" data-vendor-id="${vendorparts.vendorparts_id}"
+                                                            data-vendorpartnum="${vendorparts.vendor_partnum}"
+                                                        >
+                                                            <p>+ Submit Document</p>
+                                                        </a>
+                                    
                                                         <table class="table table-bordered" id="document-table">
                                                             <thead>
                                                                 <tr>
@@ -954,45 +1063,65 @@
                                                                     <td>Technical Data Sheet</td>
                                                                     <td>
                                                                         ${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end"></i>
+                                                                        <i class="fas fa-download float-end d-none"></i>
+                                                                        ${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet') ? `
+                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet').id}">
+                                                                            <i class="fas fa-trash align-middle"></i>
+                                                                        </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="tds_${vendorparts.vendor_id}"/></td>
+                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="tds_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'Safety Data Sheet (SDS)') ? 'has-file' : ''}">
                                                                     <td>Safety Data Sheet (SDS)</td>
                                                                     <td>
                                                                         ${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end"></i>
+                                                                        <i class="fas fa-download float-end d-none"></i>
+                                                                        ${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)') ? `
+                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)').id}">
+                                                                            <i class="fas fa-trash align-middle"></i>
+                                                                        </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="sds_${vendorparts.vendor_id}"/></td>
+                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="sds_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'Material Questionnaire') ? 'has-file' : ''}">
                                                                     <td>Material Questionnaire</td>
                                                                     <td>
                                                                         ${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end"></i>
+                                                                        <i class="fas fa-download float-end d-none"></i>
+                                                                        ${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire') ? `
+                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire').id}">
+                                                                            <i class="fas fa-trash align-middle"></i>
+                                                                        </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="mq_${vendorparts.vendor_id}"/></td>
+                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="mq_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'Composition Statement') ? 'has-file' : ''}">
                                                                     <td>Composition Statement</td>
                                                                     <td>
                                                                         ${vendorparts.documents.find(doc => doc.type === 'Composition Statement')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end"></i>
+                                                                        <i class="fas fa-download float-end d-none"></i>
+                                                                        ${vendorparts.documents.find(doc => doc.type === 'Composition Statement') ? `
+                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Composition Statement').id}">
+                                                                            <i class="fas fa-trash align-middle"></i>
+                                                                        </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="cs_${vendorparts.vendor_id}"/></td>
+                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="cs_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'No Animal Testing') ? 'has-file' : ''}">
                                                                     <td>No Animal Testing</td>
                                                                     <td>
                                                                         ${vendorparts.documents.find(doc => doc.type === 'No Animal Testing')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end"></i>
+                                                                        <i class="fas fa-download float-end d-none"></i>
+                                                                        ${vendorparts.documents.find(doc => doc.type === 'No Animal Testing') ? `
+                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'No Animal Testing').id}">
+                                                                            <i class="fas fa-trash align-middle"></i>
+                                                                        </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="nat_${vendorparts.vendor_id}"/></td>
+                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="nat_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                             </tbody>
@@ -1003,23 +1132,16 @@
                                         </div><hr>
                                     `;
                                 
-                                    vendorDocumentChecklists.append(checklistHtml);
-
-                                    $(document).on('click', '.accordion-button', function() {
-                                        const chevronDown = $(this).find('.icon-arrow-down');
-                                        const chevronUp = $(this).find('.icon-arrow-up');
-                                        chevronDown.toggleClass('d-none');
-                                        chevronUp.toggleClass('d-none');
-                                    });
+                                    vendorDocumentChecklists.append(checklistDocumentHtml);
 
                                     vendorparts.documents.forEach(function(document) {
                                         console.log('Document type: ', document.type, 'File: ', document.file);
                                         var typeToIdMap = {
-                                            'Technical Data Sheet': '#tds_' + vendorparts.vendor_id,
-                                            'Safety Data Sheet (SDS)': '#sds_' + vendorparts.vendor_id,
-                                            'Material Questionnaire': '#mq_' + vendorparts.vendor_id,
-                                            'Composition Statement': '#cs_' + vendorparts.vendor_id,
-                                            'No Animal Testing': '#nat_' + vendorparts.vendor_id
+                                            'Technical Data Sheet': '#tds_' + vendorparts.vendorparts_id,
+                                            'Safety Data Sheet (SDS)': '#sds_' + vendorparts.vendorparts_id,
+                                            'Material Questionnaire': '#mq_' + vendorparts.vendorparts_id,
+                                            'Composition Statement': '#cs_' + vendorparts.vendorparts_id,
+                                            'No Animal Testing': '#nat_' + vendorparts.vendorparts_id
                                         };
 
                                         var elementId = typeToIdMap[document.type];
@@ -1090,7 +1212,7 @@
 
                 });
 
-            //========================================================================================================================================
+            //=======================================ADD INVENTORY LOGIC=================================================================================================
           
                 $('#add_inventory').click(function(e) {
                     e.preventDefault();
@@ -1175,7 +1297,7 @@
                     });
                 });
 
-            //========================================================================================================================================
+            //========================================UPDATE INVENTORY LOGIC================================================================================================
           
                  $('#update_inventory').click(function(e) {
                     e.preventDefault();
@@ -1259,7 +1381,7 @@
                     });
                 });
           
-            //========================================================================================================================================
+            //========================================DELETE INVENTORY LOGIC================================================================================================
 
                 $('#delete_inventory').click(function(e) {
                     e.preventDefault(); 
@@ -1334,7 +1456,7 @@
                     });
                 });
             
-            //========================================================================================================================================
+            //=========================================DELETE VENDORPARTS LOGIC===============================================================================================
                 
                 $(document).on('click', '.delete_vendor', function() {
 
@@ -1392,7 +1514,7 @@
                 });
 
                 
-            //========================================================================================================================================
+            //===========================================SEARCH BUTTON LOGIC=============================================================================================
             
                 $('#search_button').click(function() {
                     var partNumber = $('#search_partnum').val().trim().toLowerCase();
@@ -1423,7 +1545,7 @@
                     console.log('Matched Rows:', matchedRows);
                 });
             
-            //========================================================================================================================================
+            //============================================VENDOR PART BTN ONCLICK LOGIC============================================================================================
                 
                 $('#vendor_parts_btn').on('click', function(event) {
                     
@@ -1486,69 +1608,80 @@
                     });
 
                 });
-            //========================================================================================================================================
+            //==========================================FILE INPUT LOGIC==============================================================================================
                 
                 var $fileInput = $("#fileInput");
                 var $fileListContainer = $("#fileListContainer");
                 var $placeholderText = $("#placeholderText");
-
+                
+                // Allowed file extensions
+                var allowedExtensions = ['jpeg', 'jpg', 'png', 'pdf'];
+                
                 $fileListContainer.on("click", function(event) {
                     if (event.target.id === "fileListContainer" || event.target.id === "placeholderText") {
                         $fileInput.click();
                     }
                 });
-
+                
                 $fileInput.on("change", function() {
                     var files = $fileInput[0].files;
                     $fileListContainer.empty(); // Clear previous file list
-
+                
                     if (files.length > 0) {
                         for (var i = 0; i < files.length; i++) {
                             (function(file, index) {
-                                var fileItem = $("<div></div>").addClass("file-item").css({
-                                    "display": "flex",
-                                    "justify-content": "space-between",
-                                    "align-items": "center",
-                                    "padding": "5px 0",
-                                    "font-size": "12px",
-                                });
-                                var fileName = $("<span></span>").text(file.name);
-                                var removeButton = $("<button>&times;</button>").css({
-                                    "background": "none",
-                                    "border": "none",
-                                    "color": "red",
-                                    "cursor": "pointer",
-                                    "font-size": "16px",
-                                    "font-weight": "bold"
-                                });
-
-                                removeButton.on("click", function(event) {
-                                    event.stopPropagation(); 
-                                    fileItem.remove();
-
-                                    var dt = new DataTransfer();
-                                    for (var j = 0; j < files.length; j++) {
-                                        if (j !== index) {
-                                            dt.items.add(files[j]);
+                                // Extract file extension
+                                var extension = file.name.split('.').pop().toLowerCase();
+                                
+                                if (allowedExtensions.includes(extension)) {
+                                    var fileItem = $("<div></div>").addClass("file-item").css({
+                                        "display": "flex",
+                                        "justify-content": "space-between",
+                                        "align-items": "center",
+                                        "padding": "5px 0",
+                                        "font-size": "12px",
+                                    });
+                                    var fileName = $("<span></span>").text(file.name);
+                                    var removeButton = $("<button>&times;</button>").css({
+                                        "background": "none",
+                                        "border": "none",
+                                        "color": "red",
+                                        "cursor": "pointer",
+                                        "font-size": "16px",
+                                        "font-weight": "bold"
+                                    });
+                
+                                    removeButton.on("click", function(event) {
+                                        event.stopPropagation(); 
+                                        fileItem.remove();
+                
+                                        var dt = new DataTransfer();
+                                        for (var j = 0; j < files.length; j++) {
+                                            if (j !== index) {
+                                                dt.items.add(files[j]);
+                                            }
                                         }
-                                    }
-                                    $fileInput[0].files = dt.files;
-
-                                    if ($fileInput[0].files.length === 0) {
-                                        $fileListContainer.append($placeholderText);
-                                    }
-                                });
-
-                                fileItem.append(fileName).append(removeButton);
-                                $fileListContainer.append(fileItem);
+                                        $fileInput[0].files = dt.files;
+                
+                                        if ($fileInput[0].files.length === 0) {
+                                            $fileListContainer.append($placeholderText);
+                                        }
+                                    });
+                
+                                    fileItem.append(fileName).append(removeButton);
+                                    $fileListContainer.append(fileItem);
+                                } else {
+                                    alert(`File type not allowed: ${file.name}`);
+                                }
                             })(files[i], i);
                         }
                     } else {
                         $fileListContainer.append($placeholderText);
                     }
                 });
+            
 
-            //========================================================================================================================================
+            //============================================FILE UPLOAD FORM LOGIC============================================================================================
               
                 $("#fileUploadForm").on("submit", function(event) {
                     event.preventDefault(); 
@@ -1556,73 +1689,60 @@
                     var formData = new FormData(this); 
                     let actionUrl = "{% url 'upload_partdocuments' %}";
 
-                    if ($fileInput[0].files.length === 0 && formData) {
-                        event.preventDefault();
-                        swal({
-                            title: "Warning",
-                            text: "All fields are required.",
-                            icon: "warning",
-                            buttons: {
-                                confirm: {
-                                    className: "btn btn-warning",
-                                },
-                            },
-                        });
-                    } else {
-                        $('#loading-indicator').show();
+                    $('#loading-indicator').show();
 
-                        $.ajax({
-                            url: actionUrl,
-                            type: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false, 
-                            headers: {
-                                'X-CSRFToken': '{{ csrf_token }}'
-                            },
-                            success: function(response) {
-                                setTimeout(function() {            
-                                    swal({
-                                        title: "Upload!",
-                                        text: "Upload succesfully",
-                                        icon: "success",
-                                        buttons: {
-                                            confirm: {
-                                                className: "btn btn-success",
-                                            },
-                                        },
-                                        timer: 3000 
-                                    }).then(() => {
-                                        location.reload(); 
-                                    });
-                                }, 500); 
-                            },
-                            error: function(xhr, status, error) {
-                                $('#loading-indicator').hide();
+                    $.ajax({
+                        url: actionUrl,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false, 
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            setTimeout(function() {            
                                 swal({
-                                    title: "Error",
-                                    text: "An error occurred while trying to upload the file.",
-                                    icon: "error",
+                                    title: "Upload!",
+                                    text: "Upload succesfully",
+                                    icon: "success",
                                     buttons: {
                                         confirm: {
-                                            className: "btn btn-danger",
+                                            className: "btn btn-success",
                                         },
                                     },
+                                    timer: 3000 
+                                }).then(() => {
+                                    location.reload(); 
                                 });
-                            },
-                            complete: function() {
-                                setTimeout(function() {
-                                    $('#loading-indicator').hide();
-                                }, 3000); 
-                            }
-                        });
-                    }
+                            }, 500); 
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "An error occurred while trying to upload the file.",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        }
+                    });
+                    
 
                 });
 
-            //========================================================================================================================================
+            //==========================================VENDOR SELECT FOR MODAL LOGIC==============================================================================================
                 
-                $('#vendor_select_for_docs_modal').on('change', function() {
+                $(document).on('change', '#vendor_select_for_docs_modal', function() {
                     var vendorparts_id = $(this).val(); 
                 
                     $.ajax({
@@ -1645,7 +1765,7 @@
                     });
                 });
 
-            //========================================================================================================================================
+            //============================================DELETE DOCUMENT LOGIC============================================================================================
                 
                 $(document).on('click', '.delete-document', function(e) {
                 //$('.delete-document').click(function(e) {
@@ -1667,13 +1787,10 @@
                         },
                     }).then((Delete) => {
                         if (Delete) {
-                            $('#loading-indicator').show();
-                            var partDocumentId = $('#edit_document_id').val();
 
-                            console.log('partDocumentId: ', partDocumentId);
-                            
+                            var partDocumentId = $(this).data('partdocument-id');
                             var url = '/parts/delete_part_document/' + partDocumentId + '/'; 
-                
+                            $('#loading-indicator').show();
                             $.ajax({
                                 url: url,
                                 type: 'POST', 
@@ -1681,9 +1798,7 @@
                                     'csrfmiddlewaretoken': '{{ csrf_token }}'
                                 },
                                 success: function(response) {
-                                    setTimeout(function() {
-                                        $('#loading-indicator').hide();
-                
+                                    setTimeout(function() {                
                                         swal({
                                             title: "Deleted!",
                                             text: "Associated document has been deleted.",
@@ -1723,7 +1838,7 @@
                         }
                     });
                 });
-            //========================================================================================================================================
+            //=========================================HAS FILE CHECK LOGIC===============================================================================================
               
                 $(document).on('click', '.document.has-file', function() {
                     var documentType = $(this).data('type');
@@ -1773,7 +1888,7 @@
                     $('#delete-confirmation-modal').modal('show');
 
                 });
-            //========================================================================================================================================
+            //=========================================MAIN_TABLE DATATABLE ===============================================================================================
 
                 $("#main_table").DataTable({
                     dom: '<"float-start"f>',
@@ -1798,7 +1913,7 @@
 
                 $('#main_table_info').addClass('d-none');
 
-            //========================================================================================================================================
+            //===========================================ADD INGREDIENTS MODAL LOGIC=============================================================================================
 
                 $('#add-ingredients-modal').on('show.bs.modal', function (event) {
 
@@ -1811,7 +1926,7 @@
                     modal.find('#header-type').text(dataType);
                 });
 
-            //========================================================================================================================================
+            //==============================================ADD INGREDIENTS LOGIC ==========================================================================================
                
                 $('#add-ingredients').on('submit', function(e) {
                     e.preventDefault(); // Prevent the form from submitting the traditional way
@@ -1863,7 +1978,7 @@
                     });
                 });
 
-            //========================================================================================================================================
+            //=============================================DELETE INGREDIENTS LOGIC===========================================================================================
 
                 $(document).on('click', '.delete_ingredients', function() {
                     var button = $(this);
@@ -1919,10 +2034,45 @@
                         }
                     });
                 });
+            //=============================================ADD DOCUMENT MODAL LOGIC===========================================================================================
+
+                $('#add-document-modal').on('show.bs.modal', function (event) {
+                    var button = $(event.relatedTarget);
+                    
+                    var vendorId = button.data('vendor-id');
+                    var vendorName = button.data('vendor-name');
+                    var vendorPartNum = button.data('vendorpartnum');
+
+                    var modal = $(this);
+
+                    modal.find('#selected_vendorparts_id').val(vendorId);
+                    modal.find('#vendorName').val(vendorName);
+                    modal.find('#vendorPartNum').val(vendorPartNum);
+
+                    var vendorparts_id = $(this).val(); 
+                
+                    $.ajax({
+                        url: '/admin_helpers/add-document/' + vendorId + '/', 
+                        type: 'GET',
+                        success: function(response) {
+                            console.log('Received response:', response); 
                             
+                            var documentTypeSelect = $('#document_type');
+                            documentTypeSelect.empty();
+                    
+                            response.available_document_types.forEach(function(docType) {
+                                console.log('Adding document type to dropdown:', docType); 
+                                documentTypeSelect.append(new Option(docType, docType));
+                            });
+                        },
+                        error: function(error) {
+                            console.error('Error fetching document types:', error); 
+                        }
+                    });
+
+                });
         });
 
-            
     </script>
     
     <style>
@@ -2022,6 +2172,14 @@
             border: 1px solid #ccc;
             margin: 0 auto;
             background-color: white;
+        }
+
+        .unstyled-button {
+            border: none;
+            background: none;
+            padding: 0;
+            cursor: pointer;
+            margin: 0; 
         }
 
     </style>

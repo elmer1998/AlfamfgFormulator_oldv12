@@ -46,13 +46,14 @@ def part_vendor(request, part_id):
             
             # Construct the dictionary for each VendorPart
             vendor_part_data = {
-                'vendor_id': vp.id,
+                'vendorparts_id': vp.id,
                 'vendor_name': vp.vendor.vendor_name,
                 'lastcost': vp.lastcost,
                 'vendor_partnum': vp.vendorPartNumber,
                 'status': vp.status,
                 'leadtime': vp.leadTime,
-                'documents': list(part_documents)  # Convert queryset to list
+                'vendor_type': vp.vendor.vendor_type,
+                'documents': list(part_documents)
             }
 
             vendor_parts_list.append(vendor_part_data)
