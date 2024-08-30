@@ -46,6 +46,11 @@
                                         </div>
                                         
                                         <div class="form-group d-flex align-items-center">
+                                            <label for="search_active" class="me-2" style="min-width: 100px;">Show Active</label>
+                                            <input type="checkbox" class="form-check" id="search_active"/>
+                                        </div>
+
+                                        <div class="form-group d-flex align-items-center">
                                             <label for="search_description" class="me-2" style="min-width: 100px;">Description</label>
                                             <input type="text" class="form-control" id="search_description"/>
                                         </div>
@@ -73,6 +78,7 @@
 
                                                             <tr data-part-id="{{ parts_inventory.id }}"
                                                                 data-partnum="{{ parts_inventory.part_num }}"
+                                                                data-activeflag="{{ parts_inventory.activeFlag }}"
                                                                 data-trade-name="{{ parts_inventory.trade_name }}"
                                                                 data-description="{{ parts_inventory.description }}"
                                                                 data-manufacturer-name="{{ parts_inventory.manufacturer_name }}"
@@ -96,6 +102,7 @@
                                                                 data-partnum="{{ parts_inventory.part_num }}"
                                                                 data-trade-name="{{ parts_inventory.trade_name }}"
                                                                 data-description="{{ parts_inventory.description }}"
+                                                                data-activeflag="{{ parts_inventory.activeFlag }}"
                                                                 data-manufacturer-name="{{ parts_inventory.manufacturer_name }}"
                                                                 data-inventory-category="{{ parts_inventory.inventory_category }}"
                                                                 data-notes="{{ parts_inventory.notes }}"
@@ -180,148 +187,191 @@
                                                     <input type="text" class="form-control" id="partId" hidden/>
                                                     <input type="text" class="form-control" id="userId" value="{{ user.id }}" hidden/>
 
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="partnum" class="me-2" style="min-width: 140px;">Part Number</label>
-                                                        <input type="text" class="form-control" id="partnum" required/>
+                                                    <div class="row pt-4">
+                                                        <div class="col-12 col-md-8 form-group d-flex align-items-center">
+                                                            <label for="partnum" class="col-form-label" style="min-width: 140px;">Part Number</label>
+                                                            <input type="text" class="form-control ms-2" id="partnum" required />
+                                                        </div>
+                                                    
+                                                        <div class="col-12 col-md-4 form-group d-flex align-items-center">
+                                                            <label for="status" class="col-form-label" style="min-width: 60px;">Active</label>
+                                                            <input type="checkbox" class="form-check ms-2" id="status" />
+                                                        </div>
                                                     </div>
-
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="description" class="me-2" style="min-width: 140px;">Trade Name</label>
-                                                        <input type="text" class="form-control" id="trade_name"/>
-                                                    </div>
-
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="description" class="me-2" style="min-width: 140px;">Description</label>
-                                                        <input type="text" class="form-control" id="description" disabled/>
-                                                    </div>
-
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="inventory_category" class="me-2" style="min-width: 140px;">Inventory Category</label>
-                                                        
-                                                        <!--
-                                                        <select id="inventory_category" class="form-select" style="height: 40px;">
-                                                            <option value="FINISHED GOODS">FINISHED GOODS</option>
-                                                            <option value="RAW MATERIALS">RAW MATERIALS</option>
-                                                            <option value="PACKAGING">PACKAGING</option>
-                                                        </select> 
-                                                        -->
-
-                                                        <input type="text" class="form-control" id="inventory_category" disabled />
-
-                                                    </div>
-
-                                                    <div class="form-group d-flex align-items-center has-feedback">
-                                                        <label for="inci_name" class="me-2" style="min-width: 140px;">INCI</label>
-                                                        <div class="flex-grow-1">
-                                                            <input type="text" class="form-control" id="ingredients_list" disabled />
-                                                            <small id="emailHelp" class="form-text text-muted mt-1">* INCI names can be added under Technical Specs Tab</small><br>
-                                                            <small id="emailHelp" class="form-text text-muted mt-1">* Exclusive only in Raw Materials Category</small>
+                                                    <hr>
+                                                    <div class="form-group row d-flex align-items-center">
+                                                        <label for="trade_name" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">Trade Name</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <input type="text" class="form-control" id="trade_name" />
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="function" class="me-2" style="min-width: 140px;">Function</label>
-                                                        <input type="text" class="form-control" id="function" disabled />
+                                                    <div class="form-group row d-flex align-items-center">
+                                                        <label for="description" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">Description</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <input type="text" class="form-control" id="description" disabled />
+                                                        </div>
                                                     </div>
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="chemical_class" class="me-2" style="min-width: 140px;">Chemical Class</label>
-                                                        <input type="text" class="form-control" id="chemical_class" disabled/>
+                                                    
+                                                    <div class="form-group row d-flex align-items-center">
+                                                        <label for="inventory_category" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">Inventory Category</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <input type="text" class="form-control" id="inventory_category" disabled />
+                                                        </div>
                                                     </div>
-                                                    <div class="form-group d-flex align-items-center">
-                                                        <label for="notes" class="me-2" style="min-width: 140px;">Notes</label>
-                                                        <textarea class="form-control" id="notes" rows="3"></textarea>
-                                                    </div>                                                
+                                                    
+                                                    <div class="form-group row d-flex align-items-center has-feedback">
+                                                        <label for="inci_name" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">INCI</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <input type="text" class="form-control" id="ingredients_list" disabled />
+                                                            <small class="form-text text-muted mt-1">* INCI names can be added under Technical Specs Tab</small><br>
+                                                            <small class="form-text text-muted mt-1">* Exclusive only in Raw Materials Category</small>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="form-group row d-flex align-items-center">
+                                                        <label for="function" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">Function</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <input type="text" class="form-control" id="function" disabled />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="form-group row d-flex align-items-center">
+                                                        <label for="chemical_class" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">Chemical Class</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <input type="text" class="form-control" id="chemical_class" disabled />
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="form-group row d-flex align-items-center">
+                                                        <label for="notes" class="col-12 col-md-3 col-form-label" style="min-width: 140px;">Notes</label>
+                                                        <div class="col-12 col-md-9">
+                                                            <textarea class="form-control" id="notes" rows="2"></textarea>
+                                                        </div>
+                                                    </div>
+                                                                                        
                         
                                                 </div>
 
                                                 <div class="tab-pane fade" id="pills-costing" role="tabpanel" aria-labelledby="pills-costing-tab">
                                                 
-                                                    <div class="row pt-4">
-                                                        <div class="col-md-4 form-group d-flex align-items-center">
-                                                            <label for="current_cost" style="min-width: 120px;">Current Cost</label>
-                                                            <input type="text" class="form-control" id="current_cost" placeholder="$0.00" />
-                                                        </div>
-                                                        <div class="col-md-3 form-group d-flex align-items-center">
-                                                            <label for="uom" style="min-width: 40px;">per</label>
-                                                            <input type="text" class="form-control" id="uom" placeholder="Unit" disabled />
-                                                        </div>
-                                                        <div class="col-md-5 form-group d-flex align-items-center">
-                                                            <label for="costdate" style="min-width: 60px;">as of</label>
-                                                            <input type="text" class="form-control" id="costdate" placeholder="MM/DD/YYYY" disabled />
-                                                        </div>
-                                                    </div>                                                    
-                                                    
-                                                    <div class="row">
-                                                        <!-- Current Freight Input -->
-                                                        <div class="col-md-4 form-group d-flex align-items-center">
-                                                            <label for="current_freight" class="form-label" style="min-width: 120px;">Current Freight</label>
-                                                            <input type="text" class="form-control" id="current_freight" placeholder="$0.00" disabled>
-                                                        </div>
-                                                    
-                                                        <!-- Decimals Input -->
-                                                        <div class="col-md-4 form-group d-flex align-items-center">
-                                                            <input type="text" class="form-control" id="decimals" placeholder="0" disabled> &nbsp; &nbsp;
-                                                            <label for="decimals" class="form-label">Decimals</label>
-
+                                                    <div class="container">
+                                                        <!-- Current Cost, UOM, and Cost Date -->
+                                                        <div class="row pt-4">
+                                                            <div class="col-12 col-md-4 mb-3">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="current_cost" class="me-2" style="min-width: 120px;">Current Cost</label>
+                                                                    <input type="text" class="form-control" id="current_cost" placeholder="$0.00" />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-3 mb-3">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="uom" class="me-2" style="min-width: 40px;">per</label>
+                                                                    <input type="text" class="form-control" id="uom" placeholder="Unit" disabled />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-5 mb-3">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="costdate" class="me-2" style="min-width: 60px;">as of</label>
+                                                                    <input type="text" class="form-control" id="costdate" placeholder="MM/DD/YYYY" disabled />
+                                                                </div>
+                                                            </div>
                                                         </div>
                                                     
-                                                        <!-- Convert Cost Checkbox -->
-                                                        <div class="col-md-4 form-group d-flex align-items-center">
-                                                            <div class="form-check">
-                                                                <input type="checkbox" id="convertcost" class="form-check-input" disabled>
-                                                                <label for="convertcost" class="form-check-label">Convert cost when units change</label>
+                                                        <!-- Current Freight, Decimals, and Convert Cost -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12 col-md-4 mb-3">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="current_freight" class="me-2" style="min-width: 120px;">Current Freight</label>
+                                                                    <input type="text" class="form-control" id="current_freight" placeholder="$0.00" disabled />
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-4 mb-3">
+                                                                <div class="d-flex align-items-center">
+                                                                    <input type="text" class="form-control" id="decimals" placeholder="0" disabled />
+                                                                    <label for="decimals" class="ms-2">Decimals</label>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-4 mb-3">
+                                                                <div class="form-check d-flex align-items-center">
+                                                                    <input type="checkbox" id="convertcost" class="form-check-input" disabled />
+                                                                    <label for="convertcost" class="form-check-label ms-2">Convert cost when units change</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Cost + Freight -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="cost_freight" class="me-2" style="min-width: 120px;">Cost + Freight</label>
+                                                                    <input type="text" class="form-control w-100" id="cost_freight" aria-label="Cost + Freight" placeholder="$0.00" disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Lead Time -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="lead_time" class="me-2" style="min-width: 120px;">Lead Time</label>
+                                                                    <input type="text" class="form-control w-100" id="lead_time" aria-label="Lead Time" disabled />
+                                                                    <label for="lead_time" class="ms-2">Days</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Manufacturer -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="manufacturer" class="me-2" style="min-width: 120px;">Manufacturer</label>
+                                                                    <input type="text" class="form-control w-100" id="manufacturer_name" aria-label="Manufacturer" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Primary Supplier -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="vendor_name" class="me-2" style="min-width: 120px;">Primary Supplier</label>
+                                                                    <input type="text" class="form-control w-100" id="vendor_name" disabled />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Handling -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="handling" class="me-2" style="min-width: 120px;">Handling</label>
+                                                                    <div class="row g-2">
+                                                                        <div class="col-12 col-sm-4 mb-2">
+                                                                            <input type="text" class="form-control form-control-sm" id="handling_1" disabled />
+                                                                        </div>
+                                                                        <div class="col-12 col-sm-4 mb-2">
+                                                                            <input type="text" class="form-control form-control-sm" id="handling_2" disabled />
+                                                                        </div>
+                                                                        <div class="col-12 col-sm-4 mb-2">
+                                                                            <input type="text" class="form-control form-control-sm" id="handling_3" disabled />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Country of Origin -->
+                                                        <div class="row mb-3">
+                                                            <div class="col-12">
+                                                                <div class="d-flex align-items-center">
+                                                                    <label for="country_origin" class="me-2" style="min-width: 120px;">Country of Origin</label>
+                                                                    <input type="text" class="form-control w-100" id="country_origin" disabled />
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                                                                   
-                                                    <div class="row">
-                                                        <div class="col form-group d-flex align-items-center">
-                                                            <label for="cost_freight" style="min-width: 120px;">Cost + Freight</label>
-                                                            <input type="text" class="form-control w-50" id="cost_freight" aria-label="Cost + Freight" placeholder="$0.00" disabled>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col form-group d-flex align-items-center">
-                                                            <label for="lead_time" style="min-width: 120px;">Lead Time</label>
-                                                            <input type="text" class="form-control w-50" id="lead_time" aria-label="Lead Time" disabled>
-                                                            <label for="lead_time" class="ms-2">Days</label>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col form-group d-flex align-items-center">
-                                                            <label for="manufacturer" style="min-width: 120px;">Manufacturer</label>
-                                                            <input type="text" class="form-control w-50" id="manufacturer_name" aria-label="Manufacturer">
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col form-group d-flex align-items-center">
-                                                            <label for="vendor_name" style="min-width: 120px;">Primary Supplier</label>
-                                                            <input type="text" class="form-control w-50" id="vendor_name" disabled>
-                                                        </div>
-                                                    </div>
-
-                                                    <div class="row">
-                                                        <div class="col form-group d-flex align-items-center">
-                                                            <label for="handling" style="min-width: 120px;">Handling</label>
-                                                            
-                                                            <div class="d-flex">
-                                                                <input type="text" class="form-control form-control-sm mx-1" id="handling_1" style="width: 150px;" disabled>
-                                                                <input type="text" class="form-control form-control-sm mx-1" id="handling_2" style="width: 150px;" disabled>
-                                                                <input type="text" class="form-control form-control-sm mx-1" id="handling_3" style="width: 150px;" disabled>
-                                                            </div>
-                                                        </div>
-                                                    </div>                                                    
-
-                                                    <div class="row">
-                                                        <div class="col form-group d-flex align-items-center">
-                                                            <label for="country_origin" style="min-width: 120px;">Country of Origin</label>
-                                                            <input type="text" class="form-control w-50" id="country_origin" disabled>
-                                                        </div>
-                                                    </div>
-
+                                                    
                                                 </div>
 
                                                 <div class="tab-pane fade" id="pills-costing-history" role="tabpanel" aria-labelledby="pills-costing-history-tab">
@@ -514,7 +564,7 @@
 
                         <div class="form-group d-flex align-items-center">
                             <label for="ingredients" class="me-2" style="min-width: 140px;">Ingredient Name: </label>
-                            <input type="text" class="form-control" name="ingredients" id="ingredients"> 
+                            <input type="text" class="form-control ingredients" name="ingredients" id="ingredients"> 
                         </div>
                         <!-- <select class="form-select d-none" id="inci_names"> </select> -->
                              
@@ -599,10 +649,6 @@
                         <div class="form-group d-flex align-items-center">
                             <label for="vendor_id" style="min-width: 150px;">Upload File/s</label>
                             <input type="file" class="form-control document_input" id="fileInputS" name="documents" accept=".jpeg,.jpg,.png,.pdf,.xls,.csv"/>
-    
-                            <div id="fileListContainer" class="form-control d-none" style="height: auto; overflow-y: auto; cursor: pointer;" required>
-                                <p id="placeholderText" style="color: gray;">Click to select files</p>
-                            </div>
                         </div>
 
                         <div class="form-group d-flex align-items-center">
@@ -691,6 +737,7 @@
                     
                     $('p.card-title').removeClass('d-none');
 
+                    $('input.ingredients').prop('disabled', false);
                     $('input.documents').prop('disabled', false);
                     $('input.vendorparts_id').prop('disabled', false);
                     $('input.document_input').prop('disabled', false);
@@ -712,6 +759,7 @@
                     
                     var partnum = $(this).data('partnum');
                     var partId = $(this).data('part-id');
+                    var activeFlag = $(this).data('activeflag');
                     var partIdVendor = $(this).data('part-id');
                     var description = $(this).data('description');
                     var trade_name = $(this).data('trade-name');
@@ -724,12 +772,15 @@
                     var currentCost = $(this).data('current-cost');
                     var dashes;
 
+                    console.log('activeFlag: ', activeFlag);
+                    
                     if(description != "") {
                         dashes = "-";
                     } else {
                         dashes = null;
                     }
                     
+                    $('#status').prop('checked', activeFlag === 'True');
                     $('#partId').val(partId);
                     $('#partId_inci').val(partId);
                     $('#partId_vendor').val(partIdVendor);
@@ -781,7 +832,7 @@
 
                                 });
                             } else {
-                                tbody.append('<tr><td colspan="4" class="text-center">No Ingredients found for this part.</td></tr>');
+                                tbody.append('<tr><td colspan="5" class="text-center">No Ingredients found for this part.</td></tr>');
                             }
 
                             $('#ingredients_list').val(ingredient_list.join(' • '));
@@ -978,7 +1029,6 @@
                                                                 <tr>
                                                                     <th>Document Name</th>
                                                                     <th>File Name</th>
-                                                                    <th>Vendor Type</th>
                                                                     <th class="center-align">Status</th>
                                                                 </tr>
                                                             </thead>
@@ -1006,11 +1056,10 @@
                                                     <td>${docType}</td>
                                                     <td>
                                                         ${fileName}
-                                                        <a href="/parts/vendor_download/${fileName}" class="ms-3 align-middle">
+                                                        <a href="/parts/vendor_download/${fileName}" class="ms-3 align-middle float-end">
                                                             <i class="fas fa-download align-middle"></i>
                                                         </a>
                                                     </td>
-                                                    <td class="center-align"></td>
                                                     <td class="center-align"></td>
                                                 </tr>
                                             `;
@@ -1046,6 +1095,7 @@
                                                         <a href="#" data-bs-toggle="modal" data-bs-target="#add-document-modal" 
                                                             data-vendor-name="${vendorparts.vendor_name}" data-vendor-id="${vendorparts.vendorparts_id}"
                                                             data-vendorpartnum="${vendorparts.vendor_partnum}"
+                                                            data-partid="${vendorparts.part_id}"
                                                         >
                                                             <p>+ Submit Document</p>
                                                         </a>
@@ -1069,7 +1119,6 @@
                                                                             <i class="fas fa-trash align-middle"></i>
                                                                         </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="tds_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'Safety Data Sheet (SDS)') ? 'has-file' : ''}">
@@ -1082,7 +1131,6 @@
                                                                             <i class="fas fa-trash align-middle"></i>
                                                                         </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="sds_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'Material Questionnaire') ? 'has-file' : ''}">
@@ -1095,7 +1143,6 @@
                                                                             <i class="fas fa-trash align-middle"></i>
                                                                         </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="mq_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'Composition Statement') ? 'has-file' : ''}">
@@ -1108,7 +1155,6 @@
                                                                             <i class="fas fa-trash align-middle"></i>
                                                                         </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="cs_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                                 <tr class="${vendorparts.documents.some(doc => doc.type === 'No Animal Testing') ? 'has-file' : ''}">
@@ -1121,7 +1167,6 @@
                                                                             <i class="fas fa-trash align-middle"></i>
                                                                         </button>` : ''}
                                                                     </td>
-                                                                    <td class="d-none"><img src="{% static 'assets/img/check.jpg' %}" alt="check" class="d-none" width="30" height="30" id="nat_${vendorparts.vendorparts_id}"/></td>
                                                                     <td class="center-align"><input type="checkbox" name="status"></td>
                                                                 </tr>
                                                             </tbody>
@@ -1608,80 +1653,9 @@
                     });
 
                 });
-            //==========================================FILE INPUT LOGIC==============================================================================================
                 
-                var $fileInput = $("#fileInput");
-                var $fileListContainer = $("#fileListContainer");
-                var $placeholderText = $("#placeholderText");
-                
-                // Allowed file extensions
-                var allowedExtensions = ['jpeg', 'jpg', 'png', 'pdf'];
-                
-                $fileListContainer.on("click", function(event) {
-                    if (event.target.id === "fileListContainer" || event.target.id === "placeholderText") {
-                        $fileInput.click();
-                    }
-                });
-                
-                $fileInput.on("change", function() {
-                    var files = $fileInput[0].files;
-                    $fileListContainer.empty(); // Clear previous file list
-                
-                    if (files.length > 0) {
-                        for (var i = 0; i < files.length; i++) {
-                            (function(file, index) {
-                                // Extract file extension
-                                var extension = file.name.split('.').pop().toLowerCase();
-                                
-                                if (allowedExtensions.includes(extension)) {
-                                    var fileItem = $("<div></div>").addClass("file-item").css({
-                                        "display": "flex",
-                                        "justify-content": "space-between",
-                                        "align-items": "center",
-                                        "padding": "5px 0",
-                                        "font-size": "12px",
-                                    });
-                                    var fileName = $("<span></span>").text(file.name);
-                                    var removeButton = $("<button>&times;</button>").css({
-                                        "background": "none",
-                                        "border": "none",
-                                        "color": "red",
-                                        "cursor": "pointer",
-                                        "font-size": "16px",
-                                        "font-weight": "bold"
-                                    });
-                
-                                    removeButton.on("click", function(event) {
-                                        event.stopPropagation(); 
-                                        fileItem.remove();
-                
-                                        var dt = new DataTransfer();
-                                        for (var j = 0; j < files.length; j++) {
-                                            if (j !== index) {
-                                                dt.items.add(files[j]);
-                                            }
-                                        }
-                                        $fileInput[0].files = dt.files;
-                
-                                        if ($fileInput[0].files.length === 0) {
-                                            $fileListContainer.append($placeholderText);
-                                        }
-                                    });
-                
-                                    fileItem.append(fileName).append(removeButton);
-                                    $fileListContainer.append(fileItem);
-                                } else {
-                                    alert(`File type not allowed: ${file.name}`);
-                                }
-                            })(files[i], i);
-                        }
-                    } else {
-                        $fileListContainer.append($placeholderText);
-                    }
-                });
-            
-
-            //============================================FILE UPLOAD FORM LOGIC============================================================================================
+              
+            //============================================DOCUMENT UPLOAD FORM LOGIC============================================================================================
               
                 $("#fileUploadForm").on("submit", function(event) {
                     event.preventDefault(); 
@@ -1701,21 +1675,21 @@
                             'X-CSRFToken': '{{ csrf_token }}'
                         },
                         success: function(response) {
-                            setTimeout(function() {            
-                                swal({
-                                    title: "Upload!",
-                                    text: "Upload succesfully",
-                                    icon: "success",
-                                    buttons: {
-                                        confirm: {
-                                            className: "btn btn-success",
-                                        },
+                            console.log('response: ', response.status);
+                            var vendorparts = response.vendorparts;
+                            console.log('vendorparts: ', vendorparts);
+
+                            swal({
+                                title: "Success!",
+                                text: "Data updated successfully.",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
                                     },
-                                    timer: 3000 
-                                }).then(() => {
-                                    location.reload(); 
-                                });
-                            }, 500); 
+                                },
+                                timer: 3000
+                            });
                         },
                         error: function(xhr, status, error) {
                             $('#loading-indicator').hide();
@@ -1890,8 +1864,8 @@
                 });
             //=========================================MAIN_TABLE DATATABLE ===============================================================================================
 
-                $("#main_table").DataTable({
-                    dom: '<"float-start"f>',
+                var table = $("#main_table").DataTable({
+                    dom: '<"float-start d-flex align-items-center"f><"custom-filters">rtip',
                     aLengthMenu: [
                         [10, 25, 50, 100, 200, -1],
                         [10, 25, 50, 100, 200, "All"]
@@ -1910,8 +1884,51 @@
                         saveState: true,
                     },
                 });
+            
+                $('#main_table_info').removeClass('d-none').addClass('d-block');
+            
+                $('<div class="form-group d-flex align-items-center mt-1" id="custom-checkbox-filter">' +
+                    '<label for="search_active" class="me-2 mt-1" style="min-width: 40px;">Active</label>' +
+                    '<input type="checkbox" class="form-check" id="search_activeFlag"/>' +
+                '</div>').appendTo(".float-start");
+            
+                $('<div class="form-group d-flex align-items-center mt-1" id="custom-checkbox-filter">' +
+                    '<label for="search_active" class="me-2 mt-1" style="min-width: 40px;"> Inactive</label>' +
+                    '<input type="checkbox" class="form-check" id="search_inactiveFlag"/>' +
+                '</div>').appendTo(".float-start");
+            
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        if (settings.nTable.id !== 'main_table') {
+                            return true; 
+                        }
 
-                $('#main_table_info').addClass('d-none');
+                        var isActiveChecked = $('#search_activeFlag').is(':checked');
+                        var isInactiveChecked = $('#search_inactiveFlag').is(':checked');
+                        var activeFlag = $(table.row(dataIndex).node()).data('activeflag');
+    
+                        if (isActiveChecked && isInactiveChecked) {
+                            return false;
+                        }
+    
+                        if (isActiveChecked && activeFlag === 'True') {
+                            return true;
+                        }
+    
+                        if (isInactiveChecked && activeFlag === 'False') {
+                            return true;
+                        }
+    
+                        return !isActiveChecked && !isInactiveChecked;
+                    }
+                );
+    
+                $('#search_activeFlag, #search_inactiveFlag').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#search_activeFlag, #search_inactiveFlag').not(this).prop('checked', false);
+                    }
+                    table.draw();
+                });
 
             //===========================================ADD INGREDIENTS MODAL LOGIC=============================================================================================
 
@@ -2042,12 +2059,14 @@
                     var vendorId = button.data('vendor-id');
                     var vendorName = button.data('vendor-name');
                     var vendorPartNum = button.data('vendorpartnum');
-
+                    var partId = button.data('partid');
+                    console.log('partId: ', partId);
                     var modal = $(this);
 
                     modal.find('#selected_vendorparts_id').val(vendorId);
                     modal.find('#vendorName').val(vendorName);
                     modal.find('#vendorPartNum').val(vendorPartNum);
+                    modal.find('#partId').val(partId);
 
                     var vendorparts_id = $(this).val(); 
                 
@@ -2072,10 +2091,23 @@
 
                 });
         });
-
     </script>
     
     <style>
+
+        .delete-document {
+            float: right;
+            color: blue;
+            font-size: 14px;
+        }
+
+        #custom-checkbox-filter {
+            margin-left: 20px;
+        }
+
+        .accordion-button span {
+            font-size: 12px;
+        }
         
         #vendor-document-checklists {
             overflow-y: auto;
@@ -2122,11 +2154,20 @@
         #main_table tbody td {
             font-size: 12px;
         }
+        
+        #main_table_filter label,
+        #main_table_filter input {
+            font-size: 12px;
+        }
 
-        #main_table_filter {
+        #main_table_info {
+            position: sticky;
+            bottom: 0;
+            border-top: 1px solid black;
+            background-color: #F2F2F2;
             padding: 10px;
         }
-        
+
         .vendor-table {
             overflow-y: auto;
             max-height: 550px;
@@ -2134,7 +2175,13 @@
 
         #vendor-table thead th {
             background-color: #F2F2F2;
+            font-size: 12px;
             white-space: nowrap;
+        }
+
+        #vendor-table tbody td {
+            font-size: 12px;
+
         }
 
         #vendor-table thead th span {
@@ -2143,11 +2190,45 @@
 
         #technical-table thead th {
             background-color: #F2F2F2;
-            white-space: nowrap;
+            font-size: 12px;
+
+        }
+
+        #technical-table tbody td {
+            font-size: 12px;
+
+        }
+
+        #allergens-table thead th {
+            background-color: #F2F2F2;
+            font-size: 12px;
+
+        }
+
+        #allergens-table tbody td {
+            font-size: 12px;
+
+        }
+
+        #impurities-table thead th {
+            background-color: #F2F2F2;
+            font-size: 12px;
+
+        }
+
+        #impurities-table tbody td {
+            font-size: 12px;
+
         }
 
         #document-table thead th {
             background-color: #F2F2F2;
+            font-size: 12px;
+
+        }
+
+        #document-table tbody td {
+            font-size: 12px;
         }
 
         .documents {

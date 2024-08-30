@@ -8,6 +8,7 @@ urlpatterns = [
     path('add_vendor', views.add_vendor, name='add_vendor'),
     path('delete_vendor/<int:id>/', views.delete_vendor, name='delete_vendor'),
     path('update_vendor', views.update_vendor, name='update_vendor'),
+    path('update-vendor-type/', views.update_vendor_type, name='update-vendor-type'),
 
 # ============================================================================================================================================================================================================
     path('add_vendorparts', views.add_vendorparts, name='add_vendorparts'),

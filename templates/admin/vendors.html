@@ -47,7 +47,7 @@
                                         <table class="table table-hovered" id="main_table">
                                             <thead>
                                                 <tr>
-                                                    <th scope="col"><span>Registered Vendors</span></th>
+                                                    <th scope="col"><span>Vendors</span></th>
                                                 </tr>
                                             </thead>
 
@@ -57,7 +57,7 @@
                                                 <tr data-vendor-id="{{ vendor.id }}"
                                                     data-vendor-name = "{{ vendor.vendor_name }}"
                                                     data-vendor-default = "{{ vendor.default }}"
-                                                    data-status = "{{ vendor.status }}"
+                                                    data-activeflag = "{{ vendor.activeFlag }}"
                                                     data-vendor-type = "{{ vendor.vendor_type }}"
                                                     data-created-at = "{{ vendor.created_at }}"
                                                     data-updated-at = "{{ vendor.updated_at }}"
@@ -123,19 +123,25 @@
                                                     </div>
 
                                                     <div class="col form-group d-flex align-items-center">
-                                                        <label for="default" style="min-width: 120px;">Default</label>
-                                                        <input type="checkbox" id="default" value="true" disabled>                                                  
+                                                        <label for="default" style="min-width: 120px;">Active</label>
+                                                        <input type="checkbox" id="activeFlag" value="true" disabled>                                                  
                                                     </div>
 
-                                                    <fieldset class="border rounded-3 p-3 pt-4">
+                                                    <div class="col d-flex align-items-center pt-2">
+                                                        <label for="default" style="min-width: 120px;">Vendor Type: </label>
+                                                        <p id="vendor_type" class="mb-0 ms-2" style="min-width: 400px;"></p>
+                                                        <select id="vendor_type_select" class="form-select mb-0 ms-2 d-none" style="min-width: 400px;">
+                                                            <option value="RAW MATERIALS">RAW MATERIALS</option>
+                                                            <option value="PACKAGING">PACKAGING</option>
+                                                            <option value="FINISHED GOODS">FINISHED GOODS</option>
+                                                            <option value="NON CATEGORIZED">NONE CATEGORIZED</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <fieldset class="border rounded-3 p-3 pt-4 d-none">
                                                         <legend> Details:</legend>
 
-                                                        <div class="row pt-4">
-                                                            <div class="col d-flex align-items-center">
-                                                                <label class="ms-5" for="default" style="min-width: 120px;">Vendor Type: </label>
-                                                                <p id="vendor_type" class="mb-0 ms-2" style="min-width: 400px;"></p>
-                                                            </div>
-                                                        </div>
+                                                                                                           
 
                                                         <div class="row pt-4">
                                                             <div class="col d-flex align-items-center">
@@ -159,12 +165,11 @@
                                                             <thead>
                                                                 <tr class="center-align">
                                                                     <th></th>
+                                                                    <th class="left-align"><span>Vendor Part Number</span></th>
                                                                     <th class="left-align"><span>Parts</span></th>
                                                                     <th class="left-align"><span>Description</span></th>
                                                                     <th><span>Last Cost</span></th>
-                                                                    <th><span>Uom</span></th>
-                                                                    <th><span>Vendor Number</span></th>
-                                                                    <th><span></span></th>                                                                    
+                                                                    <th><span>Lead Time</span></th>
                                                                 </tr>
                         
                                                             </thead>
@@ -357,13 +362,13 @@
                     //$('.btn-group').removeClass('d-none');
                     $('li.parts').removeClass('d-none');
                     
-                    $('#vendor').prop('disabled', false);
-                    $('#default').prop('disabled', false);
+                    //$('#vendor').prop('disabled', false);
+                    //$('#default').prop('disabled', false);
 
                     var vendorid = $(this).data('vendor-id');
                     var vendorname = $(this).data('vendor-name');
                     var vendordefault = $(this).data('vendor-default');
-                    var status = $(this).data('status');
+                    var activeflag = $(this).data('activeflag');
                     var vendorType = $(this).data('vendor-type');
                     var partId = $(this).data('partId');
                     var created_at = $(this).data('created-at');
@@ -381,7 +386,7 @@
                     $('#partId').val(partId);
                     $('#vendor').val(vendorname);
                     $('#header-vendor').text(vendorname);
-                    $('#vendor_status').text(status);
+                    $('#activeFlag').prop('checked', activeflag === 'True');
 
                     $('#created_at').text(created_at);
                     $('#updated_at').text(updated_at);
@@ -399,17 +404,17 @@
                             var parts_list = [];
                             
                             if (response.length > 0) {
-                                $.each(response, function(index, parts) {
-                                    var vendorLastCost = parseFloat(parts.lastcost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                                $.each(response, function(index, vendorparts) {
+                                    var vendorLastCost = parseFloat(vendorparts.lastcost).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
                                     var row = 
                                     '<tr class="center-align">' +
                                         '<td><span>' + (index + 1) + '.' + '</span></td>' + // Add the numbering here
-                                        '<td class="left-align"><span>' + parts.part_num + '</span></td>' +
-                                        '<td class="left-align"><span>' + parts.description + '</span></td>' +
+                                        '<td class="left-align"><span>' + vendorparts.vendor_partnum + '</span></td>' +
+                                        '<td class="left-align"><span>' + vendorparts.part_num + '</span></td>' +
+                                        '<td class="left-align"><span>' + vendorparts.description + '</span></td>' +
                                         '<td><span>$' + vendorLastCost + '</span></td>' +
-                                        '<td><span></span></td>' +
-                                        '<td class="left-align"><span>' + parts.part_num + '</span></td>' +
-                                        '<td><div class="d-none delete-part-vendor-name" data-vendorparts-id="' + parts.id + '">' +
+                                        '<td><span>' + (vendorparts.vendorparts_leadtime ? vendorparts.vendorparts_leadtime : '') + '</span></td>'
+                                        '<td><div class="d-none delete-part-vendor-name" data-vendorparts-id="' + vendorparts.id + '">' +
                                             '<button class="btn btn-danger btn-sm delete_vendorparts" type="button">Remove</button>' +
                                         '</div></td>' +
                                     '</tr>';
@@ -419,7 +424,7 @@
                                    // parts_list.push(parts.vendor_name);
                                 });
                             } else {
-                                tbody.append('<tr><td colspan="10" class="text-center">No Associated Vendors found for this part.</td></tr>');
+                                tbody.append('<tr><td colspan="6" class="text-center">No Associated Part found for this vendor.</td></tr>');
                             }
                             
                         },
@@ -548,9 +553,8 @@
                 });
             
             //========================================================================================================================================
-                $("#main_table").DataTable({
-                    dom: '<"float-start"f>',
-
+                var table = $("#main_table").DataTable({
+                    dom: '<"float-start"f>rtip',
                     aLengthMenu: [
                         [10, 25, 50, 100, 200, -1],
                         [10, 25, 50, 100, 200, "All"]
@@ -561,8 +565,100 @@
                     order: [],
                 });
 
-                $('#main_table_info').addClass('d-none');
+                $('#main_table_info').removeClass('d-none').addClass('d-block');
+                
+                $('<div class="form-group d-flex align-items-center mt-1" id="custom-category-filter">' +
+                    '<label for="category_select" class="me-2" style="min-width: 45px;">Type</label>' +
+                    '<select class="form-select" id="search_vendor_type" style="width: 180px;">' +
+                        '<option value="All">ALL VENDOR TYPE</option>' +
+                        '<option value="RAW MATERIALS">RAW MATERIALS</option>' +
+                        '<option value="PACKAGING">PACKAGING</option>' +
+                        '<option value="FINISHED GOODS">FINISHED GOODS</option>' +
+                    '</select>' +
+                '</div>').appendTo(".float-start");
+
+                $.fn.dataTable.ext.search.push(
+                    function(settings, data, dataIndex) {
+                        var selectedType = $('#search_vendor_type').val();
+                        var vendorType = $(table.row(dataIndex).node()).data('vendor-type');
+            
+                        if (selectedType === 'All' || selectedType === vendorType) {
+                            return true;
+                        }
+                        return false;
+                    }
+                );
+            
+                $('#search_vendor_type').on('change', function() {
+                    table.draw();
+                });
+
             //========================================================================================================================================
+                $('#vendor_type').click(function() {
+                    var currentVendorType = $(this).text();
+            
+                    $('#vendor_type_select').val(currentVendorType);
+    
+                    $(this).addClass('d-none');
+                    $('#vendor_type_select').removeClass('d-none').focus();
+                });
+            
+                $('#vendor_type_select').on('change', function() {
+
+                    var selectedValue = $(this).val();
+                    $('#vendor_type').text(selectedValue).removeClass('d-none');
+
+                    $(this).addClass('d-none');
+
+                    var vendorId = $('#vendorId').val(); 
+                    console.log('vendorId: ', vendorId);
+                    console.log('selectedValue: ', selectedValue);
+
+                    $.ajax({
+                        type: 'POST',
+                        url: '/vendor/update-vendor-type/',
+                        data: {
+                            vendor_id: vendorId,
+                            vendor_type: selectedValue,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            $('#vendor_type').text(response.vendor_type);
+
+                            swal("Updated", "", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            });
+                        },
+                        error: function(xhr, status, error) {
+                            console.log('AJAX error: ' + error);
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        },
+                        complete: function() {
+                            setTimeout(function() {
+                                $('#loading-indicator').hide();
+                            }, 3000); 
+                        },
+                    });
+                });
 
         });
 
@@ -596,11 +692,22 @@
         }
 
         #main_table_filter {
-            padding: 10px;
+            padding-right: 24px;
         }
 
         #main_table tbody tr.selected-row {
             background-color: #f2f2f2 !important;
+        }
+
+        #main_table_info {
+            position: sticky;
+            bottom: 0;
+            border-top: 1px solid black;
+            background-color: #F2F2F2;
+            padding: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .parts-table {
@@ -617,6 +724,9 @@
         #parts-table span{
             font-size: 12px;
         }
-        
+        #search_vendor_type,
+        #search_vendor_type option {
+            font-size: 12px;
+        }
     </style>
 {% endblock %}

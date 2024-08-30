@@ -201,16 +201,14 @@ def upload_partdocuments(request):
     if request.method == 'POST':
         vendor = request.POST.get('vendor-readonly')
         vendorpart = request.POST.get('vendorpartnum-readonly')
-
+        part_id = request.POST.get('part_id')  # Retrieve part_id from POST data
         vendorparts_id = request.POST.get('vendorparts_id')
         files = request.FILES.getlist('documents')
         document_type = request.POST.get('document_type')
 
         for f in files:
-            # Extract the original file extension
             original_extension = os.path.splitext(f.name)[1]  # e.g., .jpg, .csv
 
-            # Create a custom filename that includes the original filename, vendor, and vendorpartnum
             new_filename = f"{os.path.splitext(f.name)[0]} - {vendor} - {vendorpart}{original_extension}"
 
             # Save the file with the custom filename

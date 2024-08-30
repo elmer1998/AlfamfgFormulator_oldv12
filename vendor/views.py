@@ -1,4 +1,5 @@
 
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from admin_panel.views import get_user_initials
 from part.models import Parts
@@ -68,6 +69,23 @@ def update_vendor(request):
         vendors.save()
 
         return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+def update_vendor_type(request):
+    if request.method == 'POST':
+        vendor_id = request.POST.get('vendor_id')
+        vendor_type = request.POST.get('vendor_type')
+
+        try:
+            vendor = Vendor.objects.get(id=vendor_id)
+            vendor.vendor_type = vendor_type
+            vendor.save()
+
+            return JsonResponse({'status': 'success', 'message': 'Vendor type updated successfully', 'vendor_type': vendor.vendor_type})
+        except Vendor.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Vendor not found'})
+
+    return JsonResponse({'status': 'error', 'message': 'Invalid request.'})
+
     
 # ============================================================================================================================================================================================================
 # ============================================================================================================================================================================================================

@@ -475,11 +475,11 @@
                     $('#loading-indicator').show();
 
                     $.ajax({
-                        url: '{% url "generate_excel_report" %}',  // Ensure this is the correct endpoint
+                        url: '{% url "generate_excel_report" %}',
                         method: 'POST',
                         data: {
-                            'formula_ids': JSON.stringify(selectedFormulas),  // Send selected formula IDs
-                            'csrfmiddlewaretoken': '{{ csrf_token }}'  // Ensure CSRF token is correctly rendered
+                            'formula_ids': JSON.stringify(selectedFormulas),
+                            'csrfmiddlewaretoken': '{{ csrf_token }}' 
                         },
                         success: function(response, status, xhr) {
                             /*

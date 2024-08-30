@@ -36,7 +36,7 @@ def add_document_view(request, vendorparts_id):
 def part_vendor(request, part_id):
     try:
         part = get_object_or_404(Parts, id=part_id)
-        vendor_parts = VendorParts.objects.filter(part=part).select_related('vendor')
+        vendor_parts = VendorParts.objects.filter(part=part).select_related('vendor', 'part')
 
         vendor_parts_list = []
 
@@ -53,6 +53,7 @@ def part_vendor(request, part_id):
                 'status': vp.status,
                 'leadtime': vp.leadTime,
                 'vendor_type': vp.vendor.vendor_type,
+                'part_id' : vp.part.id,
                 'documents': list(part_documents)
             }
 
@@ -77,6 +78,8 @@ def vendor_parts(request, vendor_id):
                 'lastcost': vendor_part.lastcost,
                 'description': vendor_part.part.description,
                 'vendor_partnum': vendor_part.vendorPartNumber,
+                'vendorpart_activeFlag': vendor_part.activeFlag,
+                'vendorparts_leadtime': vendor_part.leadTime,
 
             }
             for vendor_part in vendor_parts
