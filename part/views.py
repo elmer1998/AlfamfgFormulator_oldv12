@@ -302,3 +302,26 @@ def delete_ingredients(request, id):
     document.delete()
 
     return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+# ============================================================================================================================================================================================================
+
+def update_document(request):
+    document_id = request.POST.get('document_note_id')
+    new_status = request.POST.get('document_status')
+    new_notes = request.POST.get('document_notes')
+
+    document = get_object_or_404(PartDocument, id=document_id)
+
+    document.status = new_status
+    document.notes = new_notes
+    document.save()
+
+    response_data = {
+        'id': document.id,
+        'type': document.type,
+        'file': document.file.url,  # Adjust if necessary
+        'status': document.status,
+        'notes': document.notes,
+    }
+
+    return JsonResponse({'success': True, 'data': response_data})

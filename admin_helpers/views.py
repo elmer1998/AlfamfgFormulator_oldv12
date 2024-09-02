@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-
+from collections import OrderedDict
 from part.models import PartDocument, Parts
 from vendor.models import Vendor, VendorParts
 
@@ -42,15 +42,15 @@ def part_vendor(request, part_id):
 
         for vp in vendor_parts:
             # Retrieve related PartDocuments for each VendorPart
-            part_documents = PartDocument.objects.filter(vendorparts_id=vp).values('id', 'type', 'file')
+            part_documents = PartDocument.objects.filter(vendorparts_id=vp).values('id', 'type', 'file', 'status', 'notes')
             
             # Construct the dictionary for each VendorPart
             vendor_part_data = {
                 'vendorparts_id': vp.id,
                 'vendor_name': vp.vendor.vendor_name,
                 'lastcost': vp.lastcost,
-                'vendor_partnum': vp.vendorPartNumber,
-                'status': vp.status,
+                'vendorpartnum': vp.vendorPartNumber,
+                'vendorparts_status': vp.status,
                 'leadtime': vp.leadTime,
                 'vendor_type': vp.vendor.vendor_type,
                 'part_id' : vp.part.id,
@@ -62,7 +62,40 @@ def part_vendor(request, part_id):
         return JsonResponse(vendor_parts_list, safe=False)
     except Parts.DoesNotExist:
         return JsonResponse({'error': 'Part not found.'}, status=404)
+# ============================================================================================================================================================================================================
 
+def get_specific_vendor_by_part(request, part_id):
+    try:
+        part = get_object_or_404(Parts, id=part_id)
+
+        vendor_parts = VendorParts.objects.filter(part=part).select_related('vendor')
+
+        unique_vendors = OrderedDict()
+
+        for vp in vendor_parts:
+            vendor_id = vp.vendor.id
+            part_documents = PartDocument.objects.filter(vendorparts_id=vp).values('id', 'type', 'file', 'status', 'notes')
+
+            if vendor_id not in unique_vendors:
+                
+                vendor_part_data = {
+                    'part_id': part.id,
+                    'vendor_id': vp.vendor.id,
+                    'vendor_name': vp.vendor.vendor_name,
+                    'vendor_type': vp.vendor.vendor_type,
+                    'documents': list(part_documents)
+
+                }
+                
+                unique_vendors[vendor_id] = vendor_part_data
+
+        vendor_parts_list = list(unique_vendors.values())
+        print(f"Final unique vendor parts list: {vendor_parts_list}")
+
+        return JsonResponse(vendor_parts_list, safe=False)
+    except Parts.DoesNotExist:
+        return JsonResponse({'error': 'Part not found.'}, status=404)
+    
 # ============================================================================================================================================================================================================
 #vendor main retreiving the associated parts
 def vendor_parts(request, vendor_id):

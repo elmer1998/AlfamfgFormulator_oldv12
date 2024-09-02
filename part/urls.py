@@ -17,6 +17,7 @@ urlpatterns = [
     path('delete_part/<int:id>/', views.delete_part, name='delete_part'),
 # ============================================================================================================================================================================================================
     path('upload_partdocuments', views.upload_partdocuments, name='upload_partdocuments'),
+    path('update-document/', views.update_document, name='update_document'),
     path('delete_part_document/<int:document_id>/', views.delete_part_document, name='delete_part_document'),
     path('delete_document/<int:id>/', views.delete_document, name='delete_document'),
 # ============================================================================================================================================================================================================

@@ -31,178 +31,181 @@
 
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-4 d-flex">
-                                    <!-- Existing First Sidebar -->
+                                <div class="resizable-container">
+                                    <div class="resizable" id="resizable1" style="width: 5%;">
+                                        <!-- Existing First Sidebar -->
+                                        <div class="d-flex flex-column bg-light custom-siderbar-1">
+                                            <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
+                                                <li class="nav-item">
+                                                    <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        <br>
+                                                        <span>Formula</span>
+                                                    </a>
+                                                </li>
 
-                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-1" style="width: 6.5rem;">
-                                        <ul class="nav nav-pills nav-flush flex-column mb-auto text-center">
-                                            <li class="nav-item">
-                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula" data-bs-toggle="tooltip" data-bs-placement="right">
-                                                    <i class="fas fa-info-circle"></i>
-                                                    <br>
-                                                    <span>Formula</span>
-                                                </a>
-                                            </li>
+                                                <li class="nav-item" style="opacity: 0.5;">
+                                                    <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Ingredients" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                        <i class="fas fa-solid fa-tint"></i>                                                    <br>
+                                                        <span>Ingredients</span>
+                                                    </a>
+                                                </li>
 
-                                            <li class="nav-item" style="opacity: 0.5;">
-                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Ingredients" data-bs-toggle="tooltip" data-bs-placement="right">
-                                                    <i class="fas fa-solid fa-tint"></i>                                                    <br>
-                                                    <span>Ingredients</span>
-                                                </a>
-                                            </li>
+                                                <li class="nav-item" style="opacity: 0.5;">
+                                                    <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Notes" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                        <i class="fas fa-sticky-note"></i>
+                                                        <br>
+                                                        <span>Formula <br> Notes</span>
+                                                    </a>
+                                                </li>
 
-                                            <li class="nav-item" style="opacity: 0.5;">
-                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Notes" data-bs-toggle="tooltip" data-bs-placement="right">
-                                                    <i class="fas fa-sticky-note"></i>
-                                                    <br>
-                                                    <span>Formula <br> Notes</span>
-                                                </a>
-                                            </li>
-
-                                            <li class="nav-item" style="opacity: 0.5;">
-                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Archives" data-bs-toggle="tooltip" data-bs-placement="right">
-                                                    <i class="fas fa-solid fa-archive"></i>
-                                                    <br>
-                                                    <span>Archives</span>
-                                                </a>
-                                            </li>
+                                                <li class="nav-item" style="opacity: 0.5;">
+                                                    <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Archives" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                        <i class="fas fa-solid fa-archive"></i>
+                                                        <br>
+                                                        <span>Archives</span>
+                                                    </a>
+                                                </li>
 
 
-                                            <li class="nav-item" style="opacity: 0.5;">
-                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Regulatory Info" data-bs-toggle="tooltip" data-bs-placement="right">
-                                                    <i class="fas fa-file"></i> 
-                                                    <br>
-                                                    <span>Regulatory <br> Info </span>
-                                                </a>
-                                            </li>
+                                                <li class="nav-item" style="opacity: 0.5;">
+                                                    <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Regulatory Info" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                        <i class="fas fa-file"></i> 
+                                                        <br>
+                                                        <span>Regulatory <br> Info </span>
+                                                    </a>
+                                                </li>
 
-                                            <li class="nav-item" style="opacity: 0.5;">
-                                                <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Document" data-bs-toggle="tooltip" data-bs-placement="right">
-                                                    <i class="fas fa-address-book"></i>
-                                                    <br>
-                                                    <span>Formula <br> Document </span>
-                                                </a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                    
-                                    <div class="d-flex flex-column flex-shrink-0 bg-light custom-siderbar-2" style="width: 28em;">
-
-                                        <div class="ms-3 pt-2" style="max-height: 720px; height: 720px; overflow-y: auto;">
-                                            <form id="create_formula">
-                                                {% csrf_token %}
-
-                                                <div class="form-group">
-                                                    <label for="formula_num">Formula #</label>
-                                                    <input type="text" class="form-control" id="formula_num" name="formula_num" placeholder="" >
-                                                </div>
-                                                
-                                                <hr>
-
-                                                <div class="form-group">
-                                                    <label for="folderSelect" class="form-label">Folder Name *</label><br>
-                                                    <select class="form-select customSelect" id="folderSelect" name="folderSelect">
-                                                        {% for folder_formula in folder_formulas %}
-                                                            <option value="{{ folder_formula.id }}">{{ folder_formula.folder_name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-
-                                                <div class="form-group">
-                                                    <label for="brand_name">Brand Name</label>
-                                                    <input type="text" class="form-control" id="brand_name" name="brand_name" placeholder="">
-                                                </div>
-                            
-                                                <div class="form-group">
-                                                    <label for="product_name">Product Name *</label>
-                                                    <input type="text" class="form-control" id="product_name" name="product_name" placeholder="">
-                                                </div>
-                            
-                                                <div class="form-group">
-                                                    <label for="category-select" class="form-label">Category *</label><br>
-                                                    <select class="form-select customSelect" id="category-select" name="category-select">
-                                                        <option value="default"></option>
-                                                        {% for category in allcategory %}
-                                                            <option value="{{ category.id }}">{{ category.category_name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                            
-                                                <div class="form-group">
-                                                    <label for="subcategory-select" class="form-label">Sub Category *</label><br>
-                                                    <select class="form-select customSelect" id="subcategory-select" name="subcategory-select">
-                                                
-                                                    </select>
-                                                </div>
-                            
-                                                <div class="form-group">
-                                                    <label for="product_type" class="form-label">Product Type *</label>
-                                                    <select class="form-select customSelect" id="product_type" name="product_type">
-                                                    
-                                                    </select>
-                                                </div>
-                            
-                                                <div class="form-group">
-                                                    <label for="product_format" class="form-label">Product Format *</label>
-                                                    <select class="form-select customSelect" id="product_format" name="product_format">
-                                                        <option value="default"></option>
-                                                        {% for productformat in allproductformat %}
-                                                            <option value="{{ productformat.id }}">{{ productformat.product_format }} </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                            
-                                                <div class="form-group">
-                                                    <label for="formula_owner"  class="form-label">Formula Owner</label>
-                                                    <select class="form-select customSelect" id="formula_owner" name="formula_owner">
-                                                        <option value="default"></option>
-                                                        {% for user in users %}
-                                                            <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                                
-                                                <div class="form-group">
-                                                    <label for="product_qualities" class="form-label">Product Qualities</label>
-                                                    <select class="form-select customSelect" multiple id="product_qualities" name="product_qualities">
-                                                        {% for allproductquality in allproductqualities %}
-                                                            <option value="{{ allproductquality.id }}">{{ allproductquality.product_quality }} </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-
-                                                
-                                                <div class="sub-content-area" style="padding: 20px;">
-                                                    <div class="d-flex" style="justify-content: space-around;">
-                                                        <button class="btn btn-refresh-card" type="button">Clear All</button>
-                                                        <button class="btn btn-light" type="submit"> Apply</button>
-                                                    </div>
-                                                </div>
-                                            </form>
+                                                <li class="nav-item" style="opacity: 0.5;">
+                                                    <a href="#" class="nav-link py-3 border-bottom" aria-current="page" title="Formula Document" data-bs-toggle="tooltip" data-bs-placement="right">
+                                                        <i class="fas fa-address-book"></i>
+                                                        <br>
+                                                        <span>Formula <br> Document </span>
+                                                    </a>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
 
-                                </div>
-                            
-                                <div class="col-md-8">
-                                    <div class="table-responsive table-hover">
-                                        <!-- Table content here -->
-                                        <table class="table" id="main_table">
-                                            <thead>
-                                                <tr>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Item#</th>
-                                                    <th scope="col">Ingredient Name</th>
-                                                    <th scope="col"></th>
-                                                    <th scope="col">Concentration</th>
-                                                    <th scope="col">Warning Flags</th>
-                                                    <th style="width: 10px; text-align: right;" scope="col">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody> </tbody>
-                                        </table>
+                                    <div class="resizable" id="resizable2" style="width: 25%;">
+                                        <div class="d-flex flex-column bg-light custom-siderbar-2">
+                                            <div class="ms-3 pt-2" style="max-height: 720px; height: 720px; overflow-y: auto;">
+                                                <form id="create_formula">
+                                                    {% csrf_token %}
+    
+                                                    <div class="form-group">
+                                                        <label for="formula_num">Formula #</label>
+                                                        <input type="text" class="form-control" id="formula_num" name="formula_num" placeholder="" >
+                                                    </div>
+                                                    
+                                                    <hr>
+    
+                                                    <div class="form-group">
+                                                        <label for="folderSelect" class="form-label">Folder Name *</label><br>
+                                                        <select class="form-select customSelect" id="folderSelect" name="folderSelect">
+                                                            {% for folder_formula in folder_formulas %}
+                                                                <option value="{{ folder_formula.id }}">{{ folder_formula.folder_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+    
+                                                    <div class="form-group">
+                                                        <label for="brand_name">Brand Name</label>
+                                                        <input type="text" class="form-control" id="brand_name" name="brand_name" placeholder="">
+                                                    </div>
+                                
+                                                    <div class="form-group">
+                                                        <label for="product_name">Product Name *</label>
+                                                        <input type="text" class="form-control" id="product_name" name="product_name" placeholder="">
+                                                    </div>
+                                
+                                                    <div class="form-group">
+                                                        <label for="category-select" class="form-label">Category *</label><br>
+                                                        <select class="form-select customSelect" id="category-select" name="category-select">
+                                                            <option value="default"></option>
+                                                            {% for category in allcategory %}
+                                                                <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                
+                                                    <div class="form-group">
+                                                        <label for="subcategory-select" class="form-label">Sub Category *</label><br>
+                                                        <select class="form-select customSelect" id="subcategory-select" name="subcategory-select">
+                                                    
+                                                        </select>
+                                                    </div>
+                                
+                                                    <div class="form-group">
+                                                        <label for="product_type" class="form-label">Product Type *</label>
+                                                        <select class="form-select customSelect" id="product_type" name="product_type">
+                                                        
+                                                        </select>
+                                                    </div>
+                                
+                                                    <div class="form-group">
+                                                        <label for="product_format" class="form-label">Product Format *</label>
+                                                        <select class="form-select customSelect" id="product_format" name="product_format">
+                                                            <option value="default"></option>
+                                                            {% for productformat in allproductformat %}
+                                                                <option value="{{ productformat.id }}">{{ productformat.product_format }} </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                
+                                                    <div class="form-group">
+                                                        <label for="formula_owner"  class="form-label">Formula Owner</label>
+                                                        <select class="form-select customSelect" id="formula_owner" name="formula_owner">
+                                                            <option value="default"></option>
+                                                            {% for user in users %}
+                                                                <option value="{{ user.id }}">{{ user.first_name }} {{ user.last_name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
+                                                        <label for="product_qualities" class="form-label">Product Qualities</label>
+                                                        <select class="form-select customSelect" multiple id="product_qualities" name="product_qualities">
+                                                            {% for allproductquality in allproductqualities %}
+                                                                <option value="{{ allproductquality.id }}">{{ allproductquality.product_quality }} </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+    
+                                                    
+                                                    <div class="sub-content-area" style="padding: 20px;">
+                                                        <div class="d-flex" style="justify-content: space-around;">
+                                                            <button class="btn btn-refresh-card" type="button">Clear All</button>
+                                                            <button class="btn btn-light" type="submit"> Apply</button>
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <div class="resizer" id="resizer2"></div>
                                     </div>
-                                </div>
+                                    <div class="resizable" id="resizable3" style="width: 65%;">
+                                        <div class="table-responsive table-hover">
+                                            <!-- Table content here -->
+                                            <table class="table" id="main_table">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Item#</th>
+                                                        <th scope="col">Ingredient Name</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Concentration</th>
+                                                        <th scope="col">Warning Flags</th>
+                                                        <th style="width: 10px; text-align: right;" scope="col">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody> </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  
                             </div>
                             
                         </div>

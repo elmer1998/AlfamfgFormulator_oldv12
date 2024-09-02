@@ -57,6 +57,39 @@
             margin-top: 10px;
         }
 
+        .resizable-container {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+        }
+        
+        .resizable {
+            position: relative;
+            flex-grow: 1;
+            min-width: 100px;
+            border: 1px solid #ddd;
+            padding: 10px;
+            overflow: auto;
+        }
+        
+        .resizer {
+            width: 10px;
+            height: 100%;
+            background: #ddd;
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: ew-resize;
+            z-index: 10;
+        }
+
+        table th,
+        table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
     </style>
 
     <div class="wrapper">
@@ -468,13 +501,71 @@
         </footer>
         
       </div>
-
     </div>
 
     <script>
+
         $('.btn-refresh-card').click(function(e) {
             location.reload();
         });
+
+        $(document).ready(function() {
+            const $resizer1 = $('#resizer1');
+            const $resizer2 = $('#resizer2');
+            const $resizable1 = $('#resizable1');
+            const $resizable2 = $('#resizable2');
+            const $resizable3 = $('#resizable3');
+            const $container = $('.resizable-container');
+    
+            function onMouseOrTouchDown(e, resizeFunc) {
+                e.preventDefault();
+                $(document).on('mousemove touchmove', resizeFunc);
+                $(document).on('mouseup touchend', stopResize);
+            }
+    
+            $resizer1.on('mousedown touchstart', function(e) {
+                onMouseOrTouchDown(e, resize1);
+            });
+    
+            $resizer2.on('mousedown touchstart', function(e) {
+                onMouseOrTouchDown(e, resize2);
+            });
+    
+            function resize1(e) {
+                const pageX = e.type.includes('touch') ? e.touches[0].pageX : e.pageX;
+                const containerWidth = $container.width();
+                const newWidth1 = pageX - $container.offset().left;
+                const percentageWidth1 = (newWidth1 / containerWidth) * 100;
+    
+                if (percentageWidth1 >= 10 && percentageWidth1 <= 80) {
+                    $resizable1.css('width', percentageWidth1 + '%');
+                    const remainingWidth = 100 - percentageWidth1;
+                    const resizable2Width = $resizable2.width() / $container.width() * 100;
+                    $resizable2.css('width', resizable2Width + '%');
+                    $resizable3.css('width', remainingWidth - resizable2Width + '%');
+                }
+            }
+    
+            function resize2(e) {
+                const pageX = e.type.includes('touch') ? e.touches[0].pageX : e.pageX;
+                const containerWidth = $container.width();
+                const newWidth2 = pageX - $container.offset().left - $resizable1.width();
+                const percentageWidth2 = (newWidth2 / containerWidth) * 100;
+    
+                if (percentageWidth2 >= 10 && percentageWidth2 <= 80) {
+                    const resizable1Width = $resizable1.width() / $container.width() * 100;
+                    $resizable2.css('width', percentageWidth2 + '%');
+                    $resizable3.css('width', (100 - resizable1Width - percentageWidth2) + '%');
+                }
+            }
+    
+            function stopResize() {
+                $(document).off('mousemove touchmove', resize1);
+                $(document).off('mousemove touchmove', resize2);
+                $(document).off('mouseup touchend', stopResize);
+            }
+        });
+
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -514,6 +605,8 @@
     <script src="{% static 'assets/js/kaiadmin.min.js' %}"></script>
     
     <script src="{% static 'assets/js/jquery.dataTables.colResize.js' %}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
   </body>
 </html>
