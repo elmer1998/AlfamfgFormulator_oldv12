@@ -6,16 +6,15 @@ from vendor.models import Vendor, VendorParts
 
 # Create your views here.
 
-def add_document_view(request, vendorparts_id):
-    # Get the specific vendor part
-    vendor_part = get_object_or_404(VendorParts, id=vendorparts_id)
-    print(f"Vendor Part ID: {vendor_part.id}")
+def add_document_view(request, vendor_id):
 
+    #vendor_part = get_object_or_404(VendorParts, id=vendorparts_id)
+    vendor = get_object_or_404(Vendor, id=vendor_id)
+    
     # Get all document types already associated with this vendor part
-    existing_document_types = PartDocument.objects.filter(vendorparts_id=vendor_part).values_list('type', flat=True)
-    print(f"Existing Document Types for Vendor Part {vendor_part.id}: {list(existing_document_types)}")
+    existing_document_types = PartDocument.objects.filter(vendor_id=vendor).values_list('type', flat=True)
+    print(f"Existing Document Types for Vendor Part {vendor.id}: {list(existing_document_types)}")
 
-    # Define all possible document types
     all_document_types = [
         'Technical Data Sheet',
         'Safety Data Sheet (SDS)',
@@ -24,11 +23,8 @@ def add_document_view(request, vendorparts_id):
         'No Animal Testing'
     ]
     
-    # Exclude the document types that are already associated with this vendor part
     available_document_types = [doc_type for doc_type in all_document_types if doc_type not in existing_document_types]
-    print(f"Available Document Types for Vendor Part {vendor_part.id}: {available_document_types}")
 
-    # Return the available document types as a JSON response
     return JsonResponse({'available_document_types': available_document_types})
 
 # ============================================================================================================================================================================================================
@@ -37,14 +33,10 @@ def part_vendor(request, part_id):
     try:
         part = get_object_or_404(Parts, id=part_id)
         vendor_parts = VendorParts.objects.filter(part=part).select_related('vendor', 'part')
-
         vendor_parts_list = []
 
         for vp in vendor_parts:
-            # Retrieve related PartDocuments for each VendorPart
-            part_documents = PartDocument.objects.filter(vendorparts_id=vp).values('id', 'type', 'file', 'status', 'notes')
             
-            # Construct the dictionary for each VendorPart
             vendor_part_data = {
                 'vendorparts_id': vp.id,
                 'vendor_name': vp.vendor.vendor_name,
@@ -54,7 +46,7 @@ def part_vendor(request, part_id):
                 'leadtime': vp.leadTime,
                 'vendor_type': vp.vendor.vendor_type,
                 'part_id' : vp.part.id,
-                'documents': list(part_documents)
+               # 'documents': list(part_documents)
             }
 
             vendor_parts_list.append(vendor_part_data)
@@ -74,7 +66,7 @@ def get_specific_vendor_by_part(request, part_id):
 
         for vp in vendor_parts:
             vendor_id = vp.vendor.id
-            part_documents = PartDocument.objects.filter(vendorparts_id=vp).values('id', 'type', 'file', 'status', 'notes')
+            part_documents = PartDocument.objects.filter(part_id=part_id).values('id', 'type', 'file', 'status', 'notes')
 
             if vendor_id not in unique_vendors:
                 

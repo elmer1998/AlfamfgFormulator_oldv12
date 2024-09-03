@@ -352,9 +352,9 @@
 
                                                 <div class="tab-pane fade" id="pills-costing-history" role="tabpanel" aria-labelledby="pills-costing-history-tab">
 
-                                                    <div class="table-responsive vendor-table pt-4">
+                                                    <div class="table-responsive costing-history-table pt-4">
                                                        
-                                                        <table class="table display table-bordered" id="vendor-table">
+                                                        <table class="table display table-bordered" id="costing-history-table">
                                                             <thead>
                                                                 <tr class="center-align">
                                                                     <th colspan="11" style="background-color: darkgrey;"> <span> Vendors </span> </th>
@@ -370,7 +370,6 @@
                                                                     <th style="width: 10%;"><span>UOM</span></th>
                                                                     <th><span>Cost Date</span></th>
                                                                     <th><span>Lead Time</span></th>
-                                                                    <th><span>Status</span></th>
                                                                     <th style="width: 10%;"></th>
                                                                 </tr>
                                                             </thead>
@@ -609,7 +608,8 @@
 
                     <div class="modal-body">
 
-                        <input type="text" class="form-control vendorparts_id" name="vendorparts_id" id="selected_vendorparts_id" hidden>
+                        <input type="text" class="form-control vendorparts_id" name="vendor_id" id="selected_vendorid" hidden>
+                        <input type="text" class="form-control vendorparts_id" name="part_id" id="selected_partid" hidden>
 
                         <div class="form-group d-flex align-items-center">
                             <label for="vendor_id" style="min-width: 150px;">Vendor</label>
@@ -617,13 +617,7 @@
                         </div>
 
                         <div class="form-group d-flex align-items-center">
-                            <label for="vendor_id" style="min-width: 150px;">Vendor Part Number</label>
-                            <input type="text" class="form-control vendorpartnum-readonly" name="vendorpartnum-readonly" id="vendorPartNum" readonly>
-
-                        </div>
-
-                        <div class="form-group d-flex align-items-center">
-                            <label for="vendor_id" style="min-width: 150px;">Upload File/s</label>
+                            <label for="vendor_id" style="min-width: 150px;">Upload File</label>
                             <input type="file" class="form-control document_input" id="fileInputS" name="documents" accept=".jpeg,.jpg,.png,.pdf,.xls,.csv"/>
                         </div>
 
@@ -667,6 +661,37 @@
         </div>
     </div>
 
+        <!-- Add Document Notes -->
+    <div class="modal fade" id="add-document-notes-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="add-document-note">
+                    {% csrf_token %}
+
+                    <div class="modal-header">
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <input type="text" class="form-control document_notes" name="document_note_id" id="document_note_id" hidden> 
+                        <input type="text" class="form-control document_notes" name="document_status" id="document_status" hidden> 
+
+                        <div class="form-group">
+                            <label for="ingredients" class="me-2" style="min-width: 140px;">Details for <span id="status-label-modal"></span> Status: </label>
+                            <input type="text" class="form-control document_notes" name="document_notes" id="document_note"> 
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button class="btn btn-primary"  type="submit">Add </button>                                            
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -697,7 +722,7 @@
                     chevronUp.toggleClass('d-none');
                 });
 
-            //======================================MAIN TABLE CLICK LOGIC==================================================================================================
+            //======================================MAIN TABLE CLICK LOGIC==================================================================================================    
                 
                 $('#pills-technical-specs-tab').on('click', function(e) {
                     if ($(this).hasClass('disabled')) {
@@ -719,7 +744,9 @@
                     $('input.document_input').prop('disabled', false);
                     $('input.vendor-readonly').prop('disabled', false);
                     $('input.vendorpartnum-readonly').prop('disabled', false);
+                    $('input.document_notes').prop('disabled', false);
 
+                    
                     $('#main_table tbody tr').removeClass('table-active');
                     $(this).addClass('table-active');
 
@@ -747,8 +774,6 @@
                     var notes = $(this).data('notes');
                     var currentCost = $(this).data('current-cost');
                     var dashes;
-
-                    console.log('activeFlag: ', activeFlag);
                     
                     if(description != "") {
                         dashes = "-";
@@ -940,8 +965,7 @@
                         url: '/admin_helpers/part_vendor/' + partId + '/', 
                         type: 'GET',
                         success: function(response) {
-                            console.log('response: ', response);
-                            var tbody = $('#vendor-table tbody');
+                            var tbody = $('#costing-history-table tbody');
                             tbody.empty();
                             
                             var vendorSelect = $('#vendor_select_for_docs');
@@ -951,12 +975,6 @@
                             VendorSelectFormModal.empty(); 
 
                             VendorSelectFormModal.append(new Option('Select Vendor', ''));
-
-                            var vendorChecklists = $('#vendor-checklists');
-                            vendorChecklists.empty();
-
-                            var vendorDocumentChecklists = $('#vendor-document-checklists');
-                            vendorDocumentChecklists.empty();
 
                             var vendorparts_list = [];
                             
@@ -974,7 +992,6 @@
                                             '<td></td>' +
                                             '<td></td>' +
                                             '<td class="center-align">' + (vendorparts.leadtime ? vendorparts.leadtime : '') + '</td>' +
-                                            '<td>' + vendorparts.vendorparts_status + '</td>' +
                                             '<td><div class="d-none delete-part-vendor-name" data-vendor-id="' + vendorparts.vendorparts_id + '">' +
                                                 '<button class="btn btn-danger btn-sm delete_vendor" type="button">Remove</button>' +
                                             '</div></td>' +
@@ -983,266 +1000,7 @@
                                     tbody.append(row);
                                     vendorSelect.append(new Option(vendorparts.vendor_name, vendorparts.vendorparts_id));
                                     VendorSelectFormModal.append(new Option(vendorparts.vendor_name, vendorparts.vendorparts_id));
-
-                                    var checklistHtml = `
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="heading_${vendorparts.vendorparts_id}">
-                                                <button class="accordion-button accordion-vendor collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${vendorparts.vendorparts_id}" aria-expanded="false" aria-controls="collapse_${vendorparts.vendorparts_id}">
-                                                    <i class="icon-arrow-down fas fa-chevron-down"></i>
-                                                    <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
-                                                    <span class="fw-bold ms-5">
-                                                        ${vendorparts.vendor_name} - ${vendorparts.vendorpartnum} 
-                                                        [${vendorparts.vendor_type ? vendorparts.vendor_type : 'NO CATEGORY'}]
-                                                    </span>
-                                                </button>
-                                            </h2>
-                                            
-                                            <div id="collapse_${vendorparts.vendorparts_id}" class="accordion-collapse collapse" aria-labelledby="heading_${vendorparts.vendorparts_id}" data-bs-parent="#vendorDocumentChecklists">
-                                                <div class="accordion-body">
-                                                    <br>
-                                                    <div class="table-responsive">
-                                                        <table class="table table-bordered" id="document-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Document Name</th>
-                                                                    <th>File Name</th>
-                                                                    <th class="center-align">Status</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                ${generateVendorRow('Technical Data Sheet')}
-                                                                ${generateVendorRow('Safety Data Sheet (SDS)')}
-                                                                ${generateVendorRow('Material Questionnaire')}
-                                                                ${generateVendorRow('Composition Statement')}
-                                                                ${generateVendorRow('No Animal Testing')}
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div><hr>
-                                    `;
                                     
-                                    function generateVendorRow(docType) {
-                                        var doc = vendorparts.documents.find(doc => doc.type === docType);
-                                        if (doc) {
-
-                                            var fileName = doc.file.split('/').pop();
-                                            var status = doc.status;
-
-                                            return `
-                                                <tr class="has-file">
-                                                    <td>${docType}</td>
-                                                    <td>
-                                                        ${fileName}
-                                                        <a href="/parts/vendor_download/${fileName}" class="ms-3 align-middle float-end">
-                                                            <i class="fas fa-download align-middle"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td class="center-align">${status}</td>
-                                                </tr>
-                                            `;
-                                        } else {
-                                            return `
-                                                <tr>
-                                                    <td>${docType}</td>
-                                                    <td>No file uploaded</td>
-                                                    <td class="center-align"></td>
-                                                </tr>
-                                            `;
-                                        }
-                                    }
-                                
-                                    vendorChecklists.append(checklistHtml);
-
-                                    var checklistDocumentHtml = `
-                                        <div class="accordion-item">
-                                            <h2 class="accordion-header" id="heading_${vendorparts.vendorparts_id}_1">
-                                                <button class="accordion-button accordion-document collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${vendorparts.vendorparts_id}_1" aria-expanded="false" aria-controls="collapse_${vendorparts.vendorparts_id}">
-                                                    <i class="icon-arrow-down fas fa-chevron-down"></i>
-                                                    <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
-                                                    <span class="fw-bold ms-5">
-                                                        ${vendorparts.vendor_name} - ${vendorparts.vendorpartnum} 
-                                                        [${vendorparts.vendor_type ? vendorparts.vendor_type : 'NO CATEGORY'}]
-                                                    </span>
-                                                </button>
-                                            </h2>
-                                            <div id="collapse_${vendorparts.vendorparts_id}_1" class="accordion-collapse collapse" aria-labelledby="heading_${vendorparts.vendorparts_id}_1" data-bs-parent="#vendorDocumentChecklists">
-                                                <div class="accordion-body">
-                                                    <br>
-                                                    <div class="table-responsive">
-                                                        <a href="#" data-bs-toggle="modal" data-bs-target="#add-document-modal" 
-                                                            data-vendor-name="${vendorparts.vendor_name}" data-vendor-id="${vendorparts.vendorparts_id}"
-                                                            data-vendorpartnum="${vendorparts.vendorpartnum}"
-                                                            data-partid="${vendorparts.part_id}"
-                                                        >
-                                                            <p>+ Submit Document</p>
-                                                        </a>
-                                    
-                                                        <table class="table table-bordered" id="document-table">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Document Name</th>
-                                                                    <th>File Name</th>
-                                                                    <th class="center-align">Status</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                <tr class="${vendorparts.documents.some(doc => doc.type === 'Technical Data Sheet') ? 'has-file' : ''}">
-                                                                    <td>Technical Data Sheet</td>
-                                                                    <td>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end d-none"></i>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet') ? `
-                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet').id}">
-                                                                            <i class="fas fa-trash align-middle"></i>
-                                                                        </button>` : ''}
-                                                                    </td>
-                                                                    <td class="center-align">
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Technical Data Sheet') ? `
-                                                                        <select id="document_status" class="form-select">
-                                                                            <option value="In Progress" selected>In Progress / For Checking </option>    
-                                                                            <option value="Pending">Pending</option>
-                                                                            <option value="Rejected">Rejected</option>
-                                                                            <option value="Approved">Approved</option>
-                                                                        </select>` : ''}
-                                                                    </td>
-                                                                </tr>
-                                                                <tr class="${vendorparts.documents.some(doc => doc.type === 'Safety Data Sheet (SDS)') ? 'has-file' : ''}">
-                                                                    <td>Safety Data Sheet (SDS)</td>
-                                                                    <td>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end d-none"></i>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)') ? `
-                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)').id}">
-                                                                            <i class="fas fa-trash align-middle"></i>
-                                                                        </button>` : ''}
-                                                                    </td>
-                                                                    <td class="center-align">
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Safety Data Sheet (SDS)') ? `
-                                                                        <select id="document_status" class="form-select">
-                                                                            <option value="In Progress" selected>In Progress / For Checking </option>    
-                                                                            <option value="Pending">Pending</option>
-                                                                            <option value="Rejected">Rejected</option>
-                                                                            <option value="Approved">Approved</option>
-                                                                        </select>` : ''}
-                                                                    </td>
-                                                                </tr>
-                                                                <tr class="${vendorparts.documents.some(doc => doc.type === 'Material Questionnaire') ? 'has-file' : ''}">
-                                                                    <td>Material Questionnaire</td>
-                                                                    <td>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end d-none"></i>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire') ? `
-                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire').id}">
-                                                                            <i class="fas fa-trash align-middle"></i>
-                                                                        </button>` : ''}
-                                                                    </td>
-                                                                    <td class="center-align">
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Material Questionnaire') ? `
-                                                                        <select id="document_status" class="form-select">
-                                                                            <option value="In Progress" selected>In Progress / For Checking </option>    
-                                                                            <option value="Pending">Pending</option>
-                                                                            <option value="Rejected">Rejected</option>
-                                                                            <option value="Approved">Approved</option>
-                                                                        </select>` : ''}
-                                                                    </td>
-                                                                </tr>
-                                                                <tr class="${vendorparts.documents.some(doc => doc.type === 'Composition Statement') ? 'has-file' : ''}">
-                                                                    <td>Composition Statement</td>
-                                                                    <td>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Composition Statement')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end d-none"></i>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Composition Statement') ? `
-                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'Composition Statement').id}">
-                                                                            <i class="fas fa-trash align-middle"></i>
-                                                                        </button>` : ''}
-                                                                    </td>
-                                                                    <td class="center-align">
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'Composition Statement') ? `
-                                                                        <select id="document_status" class="form-select">
-                                                                            <option value="In Progress" selected>In Progress / For Checking </option>    
-                                                                            <option value="Pending">Pending</option>
-                                                                            <option value="Rejected">Rejected</option>
-                                                                            <option value="Approved">Approved</option>
-                                                                        </select>` : ''}
-                                                                    </td>
-                                                                </tr>
-                                                                <tr class="${vendorparts.documents.some(doc => doc.type === 'No Animal Testing') ? 'has-file' : ''}">
-                                                                    <td>No Animal Testing</td>
-                                                                    <td>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'No Animal Testing')?.file || 'No file uploaded'}
-                                                                        <i class="fas fa-download float-end d-none"></i>
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'No Animal Testing') ? `
-                                                                        <button class="ms-3 align-middle unstyled-button delete-document" data-partdocument-id="${vendorparts.documents.find(doc => doc.type === 'No Animal Testing').id}">
-                                                                            <i class="fas fa-trash align-middle"></i>
-                                                                        </button>` : ''}
-                                                                    </td>
-                                                                    <td class="center-align">
-                                                                        ${vendorparts.documents.find(doc => doc.type === 'No Animal Testing') ? `
-                                                                        <select id="document_status" class="form-select">
-                                                                            <option value="In Progress" selected>In Progress / For Checking </option>    
-                                                                            <option value="Pending">Pending</option>
-                                                                            <option value="Rejected">Rejected</option>
-                                                                            <option value="Approved">Approved</option>
-                                                                        </select>` : ''}
-                                                                    </td>
-                                                                </tr>
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div><hr>
-                                    `;
-                                
-                                    vendorDocumentChecklists.append(checklistDocumentHtml);
-
-                                    function generateDocumentRow(docType) {
-                                        var doc = vendorparts.documents.find(doc => doc.type === docType);
-                                        if (doc) {
-
-                                            var fileName = doc.file.split('/').pop();
-                                            var status = doc.status;
-
-                                            return `
-                                                <tr class="has-file">
-                                                    <td>${docType}</td>
-                                                    <td>
-                                                        ${fileName}
-                                                        <a href="/parts/vendor_download/${fileName}" class="ms-3 align-middle float-end">
-                                                            <i class="fas fa-download align-middle"></i>
-                                                        </a>
-                                                    </td>
-                                                    <td class="center-align">${status}</td>
-                                                </tr>
-                                            `;
-                                        } else {
-                                            return `
-                                                <tr>
-                                                    <td>${docType}</td>
-                                                    <td>No file uploaded</td>
-                                                    <td class="center-align"></td>
-                                                </tr>
-                                            `;
-                                        }
-                                    }
-
-                                    vendorparts.documents.forEach(function(document) {
-                                        console.log('Document type: ', document.type, 'File: ', document.file);
-                                        var typeToIdMap = {
-                                            'Technical Data Sheet': '#tds_' + vendorparts.vendorparts_id,
-                                            'Safety Data Sheet (SDS)': '#sds_' + vendorparts.vendorparts_id,
-                                            'Material Questionnaire': '#mq_' + vendorparts.vendorparts_id,
-                                            'Composition Statement': '#cs_' + vendorparts.vendorparts_id,
-                                            'No Animal Testing': '#nat_' + vendorparts.vendorparts_id
-                                        };
-
-                                        var elementId = typeToIdMap[document.type];
-                                        if (elementId) {
-                                           // $(elementId).removeClass('d-none');
-                                        }
-                                    });
                                 });
                             } else {
                                 tbody.append('<tr><td colspan="11" class="text-center">No Associated Vendors found for this part.</td></tr>');
@@ -1289,7 +1047,7 @@
                             $('#loading-indicator').hide();
                             swal({
                                 title: "Error",
-                                text: "An error occurred.",
+                                text: "",
                                 icon: "error",
                                 buttons: {
                                     confirm: {
@@ -1304,6 +1062,232 @@
                         }
                     });
 
+                    $.ajax({
+                        url: '/admin_helpers/get_specific_vendor_by_part/' + partId + '/', 
+                        type: 'GET',
+                        success: function(response) {
+                            console.log('specific vendor by parts: ', response);
+
+                            var vendorChecklists = $('#vendor-checklists');
+                            vendorChecklists.empty();
+
+                            var vendorDocumentChecklists = $('#vendor-document-checklists');
+                            vendorDocumentChecklists.empty();
+
+                            if (response.length > 0) {
+                                $.each(response, function(index, data) {
+
+                                    var checklistHtml = `
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading_${data.vendor_id}">
+                                                <button class="accordion-button accordion-vendor collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${data.vendor_id}" aria-expanded="false" aria-controls="collapse_${data.vendor_id}">
+                                                    <i class="icon-arrow-down fas fa-chevron-down"></i>
+                                                    <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
+                                                    <span class="fw-bold ms-5">
+                                                        ${data.vendor_name} -  
+                                                        [${data.vendor_type ? data.vendor_type : 'NO CATEGORY'}]
+                                                    </span>
+                                                </button>
+                                            </h2>
+                                            
+                                            <div id="collapse_${data.vendor_id}" class="accordion-collapse collapse" aria-labelledby="heading_${data.vendor_id}" data-bs-parent="#vendorDocumentChecklists">
+                                                <div class="accordion-body">
+                                                    <hr>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-bordered" id="document-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Document Name</th>
+                                                                    <th>File Name</th>
+                                                                    <th class="center-align">Status</th>
+                                                                    <th>Notes</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                ${generateVendorRow('Technical Data Sheet')}
+                                                                ${generateVendorRow('Safety Data Sheet (SDS)')}
+                                                                ${generateVendorRow('Material Questionnaire')}
+                                                                ${generateVendorRow('Composition Statement')}
+                                                                ${generateVendorRow('No Animal Testing')}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><hr>
+                                    `;
+                                
+                                    function generateVendorRow(docType) {
+                                        var doc = data.documents.find(doc => doc.type === docType);
+                                        if (doc) {
+
+                                            var fileName = doc.file.split('/').pop();
+                                            var status = doc.status;
+
+                                            return `
+                                                <tr class="has-file">
+                                                    <td>${docType}</td>
+                                                    <td>
+                                                        ${fileName}
+                                                        <a href="/parts/vendor_download/${fileName}" class="ms-3 align-middle float-end">
+                                                            <i class="fas fa-download align-middle"></i>
+                                                        </a>
+                                                    </td>
+                                                    <td class="center-align">${status}</td>
+                                                    <td class="center-align"></td>
+
+                                                </tr>
+                                            `;
+                                        } else {
+                                            return `
+                                                <tr>
+                                                    <td>${docType}</td>
+                                                    <td>No file uploaded</td>
+                                                    <td class="center-align"><td>
+                                                </tr>
+                                            `;
+                                        }
+                                    }
+                            
+                                    vendorChecklists.append(checklistHtml);
+
+                                    var checklistDocumentHtml = `
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header" id="heading_${data.vendor_id}_1">
+                                                <button class="accordion-button accordion-document collapsed ms-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse_${data.vendor_id}_1" aria-expanded="false" aria-controls="collapse_${data.vendor_id}">
+                                                    <i class="icon-arrow-down fas fa-chevron-down"></i>
+                                                    <i class="icon-arrow-up fas fa-chevron-up d-none"></i>
+                                                    <span class="fw-bold ms-5">
+                                                        ${data.vendor_name} -
+                                                        [${data.vendor_type ? data.vendor_type : 'NO CATEGORY'}]
+                                                    </span>
+                                                </button>
+                                            </h2>
+                                            <div id="collapse_${data.vendor_id}_1" class="accordion-collapse collapse" aria-labelledby="heading_${data.vendor_id}_1" data-bs-parent="#vendorDocumentChecklists">
+                                                <div class="accordion-body">
+                                                    <hr>
+                                                    <div class="table-responsive">
+                                                        <p>
+                                                            <span
+                                                                data-bs-toggle="modal" data-bs-target="#add-document-modal" data-vendor-name="${data.vendor_name}" 
+                                                                data-vendor-id="${data.vendor_id}"
+                                                                data-part-id="${data.part_id}"
+                                                                style="color: blue; cursor: pointer;"
+                                                            >
+                                                                + Submit Document
+                                                            </span>
+                                                        </p>
+                                    
+                                                        <table class="table table-bordered" id="document-table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>Document Name</th>
+                                                                    <th>File Name</th>
+                                                                    <th class="center-align">Status</th>
+                                                                    <th class="left-align">Notes</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                ${generateDocumentRow('Technical Data Sheet')}
+                                                                ${generateDocumentRow('Safety Data Sheet (SDS)')}
+                                                                ${generateDocumentRow('Material Questionnaire')}
+                                                                ${generateDocumentRow('Composition Statement')}
+                                                                ${generateDocumentRow('No Animal Testing')}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div><hr>
+                                    `;
+                                
+                                    function generateDocumentRow(docType) {
+                                        var doc = data.documents.find(doc => doc.type === docType);
+                                        if (doc) {
+                                            var fileName = doc.file.split('/').pop();
+                                            var status = doc.status;
+                                            var notes = doc.notes ? doc.notes : '';
+                                            
+                                            const statusOptions = [
+                                                "In Progress",
+                                                "Pending",
+                                                "Rejected",
+                                                "Approved"
+                                            ];
+                                    
+                                            const statusOptionsHtml = statusOptions
+                                                .filter(option => option === status || option !== "In Progress")
+                                                .map(option => `<option value="${option}" ${option === status ? 'selected' : ''}>${option}</option>`)
+                                                .join('');
+                                    
+                                            return `
+                                                <tr class="has-file">
+                                                    <td>${docType}</td>
+                                                    <td>
+                                                        <div class="d-flex align-items-center justify-content-between">
+                                                            <span style="word-break: break-word; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: inline-block;">
+                                                                ${fileName}
+                                                            </span>
+                                                            <a href="/parts/vendor_download/${fileName}" class="ms-5 align-middle float-end delete-document" data-partdocument-id="${docType.id}">
+                                                                <i class="fas fa-trash align-middle"></i>
+                                                            </a>
+                                                        </div>
+                                                    </td>
+                                                    <td class="center-align">
+                                                        <select class="form-select document-status-note" data-status="${status}" data-document-note-id="${doc.id}">
+                                                            ${statusOptionsHtml}
+                                                        </select>
+                                                    </td>
+                                                    <td class="left-align">
+                                                        ${notes}
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        } else {
+                                            return `
+                                                <tr>
+                                                    <td>${docType}</td>
+                                                    <td>No file uploaded</td>
+                                                    <td class="center-align"></td>
+                                                    <td class="center-align"></td>
+                                                </tr>
+                                            `;
+                                        }
+                                    }
+
+                                    vendorDocumentChecklists.append(checklistDocumentHtml);
+
+                                });
+                            } else {
+                                
+                                var checklistHtmlNone = `
+                                    <div></div>
+                                `;
+
+                                vendorChecklists.append(checklistHtmlNone);
+                                vendorDocumentChecklists.append(checklistHtmlNone);
+
+                            }
+                            
+                        },
+                        error: function(xhr, status, error) {
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        }
+                    });
                 });
 
             //=======================================ADD INVENTORY LOGIC=================================================================================================
@@ -1371,8 +1355,7 @@
                             swal({
                                 title: "Error",
                                 text: "An error occurred while trying to add the part.",
-                                icon: "error",
-                                buttons: {
+                                 buttons: {
                                     confirm: {
                                         className: "btn btn-danger",
                                     },
@@ -2106,16 +2089,15 @@
                     var button = $(event.relatedTarget);
                     
                     var vendorId = button.data('vendor-id');
+                    var partId = button.data('part-id');
                     var vendorName = button.data('vendor-name');
-                    var vendorPartNum = button.data('vendorpartnum');
-                    var partId = button.data('partid');
                     console.log('partId: ', partId);
                     var modal = $(this);
 
-                    modal.find('#selected_vendorparts_id').val(vendorId);
+                    modal.find('#selected_vendorid').val(vendorId);
                     modal.find('#vendorName').val(vendorName);
-                    modal.find('#vendorPartNum').val(vendorPartNum);
-                    modal.find('#partId').val(partId);
+                    modal.find('#selected_partid').val(partId);
+                    //modal.find('#partId').val(partId);
 
                     var vendorparts_id = $(this).val(); 
                 
@@ -2137,7 +2119,84 @@
                             console.error('Error fetching document types:', error); 
                         }
                     });
+                });
 
+            //============================================= DOCUMENT STATUS NOTE MODAL LOGIC===========================================================================================
+
+                $(document).on('change', '.document-status-note', function() {
+
+                    console.log('Document note triggered');
+
+                    var selectedStatus = $(this).val();
+                    
+                    var documentId = $(this).data('document-note-id');
+            
+                    $('#status-label-modal').text(selectedStatus);
+                    $('#document_status').val(selectedStatus);
+                    $('#document_note_id').val(documentId); // If you need to use this value later
+            
+                    // Show the modal
+                    $('#add-document-notes-modal').modal('show');
+                });
+            //=============================================UPDATE DOCUMENT STATUS NOTE LOGIC===========================================================================================
+
+                $('#add-document-note').on('submit', function(event) {
+                    event.preventDefault();
+            
+                    var formData = $(this).serialize(); 
+            
+                    $('#loading-indicator').show();
+
+                    $.ajax({
+                        url: '/parts/update-document/',
+                        type: 'POST',
+                        data: formData,
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            console.log('response data: ', response.data);
+                            swal("Success!", "", {
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+
+                            /*
+                            $('#add-document-notes-modal').modal('hide');
+                            var row = $(`select[data-document-note-id="${response.document_id}"]`).closest('tr');
+                            row.find('td.left-align').text(response.notes);
+                            
+                            console.log(response);
+                            console.log(row.find('td.left-align'));
+
+                            */
+                        },
+                        error: function(xhr, errmsg, err) {
+                            console.error('Error:', errmsg);
+                            $('#loading-indicator').hide();
+                            swal({
+                                title: "Error",
+                                text: "",
+                                 buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger",
+                                    },
+                                },
+                            }).then(() => {
+                                setTimeout(function() {
+                                    location.reload(); 
+                                }, 1000); 
+                            });
+                        }
+                    });
                 });
         });
     </script>
@@ -2158,9 +2217,14 @@
             font-size: 12px;
         }
         
+        #vendor-checklists {
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
         #vendor-document-checklists {
             overflow-y: auto;
-            max-height: 500px;
+            max-height: 600px;
         }
 
         #main_table {
@@ -2217,7 +2281,7 @@
             padding: 10px;
         }
 
-        .vendor-table {
+        .costing-history-table {
             overflow-y: auto;
             max-height: 550px;
         }
@@ -2268,6 +2332,11 @@
         #impurities-table tbody td {
             font-size: 12px;
 
+        }
+
+        .document-table {
+            overflow-y: auto;
+            max-height: 550px;
         }
 
         #document-table thead th {

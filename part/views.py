@@ -201,22 +201,23 @@ def upload_partdocuments(request):
     if request.method == 'POST':
         vendor = request.POST.get('vendor-readonly')
         vendorpart = request.POST.get('vendorpartnum-readonly')
-        part_id = request.POST.get('part_id')  # Retrieve part_id from POST data
-        vendorparts_id = request.POST.get('vendorparts_id')
+        part_id = request.POST.get('part_id')
+        vendor_id = request.POST.get('vendor_id')
+        #vendorparts_id = request.POST.get('vendorparts_id')
         files = request.FILES.getlist('documents')
         document_type = request.POST.get('document_type')
 
         for f in files:
             original_extension = os.path.splitext(f.name)[1]  # e.g., .jpg, .csv
 
-            new_filename = f"{os.path.splitext(f.name)[0]} - {vendor} - {vendorpart}{original_extension}"
+            new_filename = f"{os.path.splitext(f.name)[0]} - {vendor}{original_extension}"
 
             # Save the file with the custom filename
             fs = FileSystemStorage(location=settings.MEDIA_ROOT)
             saved_filename = fs.save(new_filename, f)
 
             # Save the file information to the database
-            PartDocument.objects.create(vendorparts_id=vendorparts_id, file=saved_filename, type=document_type)
+            PartDocument.objects.create(vendor_id=vendor_id, part_id=part_id, file=saved_filename, type=document_type)
 
         return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
     

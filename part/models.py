@@ -32,9 +32,10 @@ class PartDocument(models.Model):
     type = models.CharField(max_length=255, null=True, blank=True)
     upload_date = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
-    vendorparts = models.ForeignKey('vendor.VendorParts', on_delete=models.CASCADE, null=True, blank=True)
     status = models.CharField(max_length=255, default='In Progress')
     notes = models.CharField(max_length=255, null=True, blank=True)
+    vendor = models.ForeignKey('vendor.Vendor', on_delete=models.CASCADE, null=True, blank=True)
+    part = models.ForeignKey('part.Parts', on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
         db_table = 'part_document'
